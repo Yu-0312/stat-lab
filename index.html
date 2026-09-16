@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="十六關的互動式統計學課程：用同一份睡眠研究資料，同時學會 Excel、JASP 與 SPSS，從描述統計一路到迴歸與 APA 報告。">
+<meta name="description" content="十六關的互動式統計學課程：公式推導、逐步手算、網頁內建的迷你 Excel 實作，並對照 JASP 與 SPSS 的操作。">
 <meta name="color-scheme" content="light dark">
 <meta property="og:title" content="睡眠研究統計教室">
-<meta property="og:description" content="互動式統計學課程 — Excel · JASP · SPSS 三軟體並行，16 關循序漸進。">
+<meta property="og:description" content="互動式統計學課程 — 推導、手算、網頁內 Excel 實作，Excel · JASP · SPSS 三軟體並行。">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
 <style>
@@ -226,6 +226,80 @@ select,input[type=number]{font:inherit;font-size:.84rem;padding:.3rem .45rem;bor
 .legend span{display:inline-flex;align-items:center;gap:.35rem}
 .legend i{width:11px;height:3px;border-radius:2px;display:inline-block}
 
+/* ---------- 迷你試算表 ---------- */
+.lab{border:1px solid var(--rule);border-radius:12px;background:var(--surface);overflow:hidden}
+.lab-head{padding:.7rem .9rem;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;
+  align-items:baseline;gap:.6rem;flex-wrap:wrap;background:var(--surface-2)}
+.lab-head h4{font-size:.92rem;font-family:var(--font-body)}
+.lab-head .hint{font-size:.74rem;color:var(--ink-3)}
+.fbar{display:grid;grid-template-columns:4.2rem 1fr;gap:.5rem;align-items:center;padding:.4rem .6rem;
+  border-bottom:1px solid var(--rule);background:var(--surface)}
+.fbar .fref{font-family:var(--font-mono);font-size:.76rem;color:var(--ink-3);text-align:center;
+  background:var(--surface-2);border-radius:5px;padding:.15rem 0}
+.fbar .fval{font-family:var(--font-mono);font-size:.78rem;color:var(--ink);overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.sheet-wrap{overflow:auto;max-height:21rem;background:var(--surface)}
+table.sheet{border-collapse:separate;border-spacing:0;font-family:var(--font-mono);font-size:.76rem;
+  font-variant-numeric:tabular-nums}
+.sheet th,.sheet td{border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  white-space:nowrap;height:1.55rem}
+.sheet thead th{position:sticky;top:0;z-index:3;background:var(--surface-3);color:var(--ink-3);
+  text-align:center;font-weight:500;min-width:3.6rem;padding:.1rem .35rem;font-size:.7rem}
+.sheet thead th:first-child{left:0;z-index:4;min-width:2.1rem}
+.sheet tbody th{position:sticky;left:0;z-index:2;background:var(--surface-3);color:var(--ink-3);
+  text-align:center;font-weight:400;min-width:2.1rem;padding:.1rem .3rem;font-size:.7rem}
+.sheet td{padding:.1rem .4rem;color:var(--ink);text-align:right}
+.sheet td.hdr{background:var(--surface-2);font-weight:600;color:var(--ink);text-align:center;font-size:.72rem}
+.sheet td.lbl{text-align:left;color:var(--ink-2);background:var(--surface-2);font-family:var(--font-body);
+  font-size:.74rem;padding-left:.5rem}
+.sheet td.edit{padding:0;background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.sheet td.edit input{width:100%;min-width:8.5rem;border:0;background:transparent;font:inherit;
+  color:var(--ink);padding:.1rem .4rem;text-align:right;border-radius:0}
+.sheet td.edit input:focus{outline:2px solid var(--accent);outline-offset:-2px;text-align:left}
+.sheet td.ok{background:var(--good-soft);box-shadow:inset 0 0 0 1px var(--good)}
+.sheet td.bad{background:var(--bad-soft);box-shadow:inset 0 0 0 1px var(--bad)}
+.sheet td.err{color:var(--bad)}
+.tasks{display:flex;flex-direction:column;gap:.5rem;padding:.85rem;border-top:1px solid var(--rule)}
+.task{display:grid;grid-template-columns:auto 1fr auto;gap:.55rem;align-items:center;
+  border:1px solid var(--rule);border-radius:9px;padding:.5rem .65rem}
+.task .tc{font-family:var(--font-mono);font-size:.72rem;color:var(--accent);background:var(--accent-soft);
+  padding:.1rem .4rem;border-radius:4px;align-self:start;margin-top:.1rem}
+.task .td{font-size:.84rem;color:var(--ink-2)}
+.task .td b{color:var(--ink)}
+.task .ta{display:flex;gap:.35rem;align-self:start}
+.task .mini{font-size:.74rem;padding:.2rem .45rem;border-radius:5px;border:1px solid var(--rule-2);color:var(--ink-2);white-space:nowrap}
+.task .mini:hover{background:var(--surface-2);color:var(--ink)}
+.task .msg{grid-column:1/-1;font-size:.78rem;border-radius:6px;padding:.35rem .5rem;
+  background:var(--surface-2);color:var(--ink-2);font-family:var(--font-body)}
+.task.solved{border-color:var(--good);background:var(--good-soft)}
+.task.solved .msg{background:transparent;color:var(--good)}
+.task.miss{border-color:var(--bad)}
+.task.miss .msg{background:var(--bad-soft);color:var(--bad)}
+.lab-foot{padding:.65rem .85rem;border-top:1px solid var(--rule);display:flex;gap:.5rem;
+  align-items:center;flex-wrap:wrap;justify-content:space-between}
+.fn-list{padding:.7rem .85rem;border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink-2)}
+.fn-list summary{cursor:pointer;font-size:.78rem;color:var(--ink-3)}
+.fn-list code{display:inline-block;background:var(--surface-2);border-radius:4px;padding:.05rem .3rem;margin:.12rem .12rem 0 0}
+
+/* ---------- 深入區塊 ---------- */
+.sec{display:flex;align-items:center;gap:.7rem;margin-top:1.6rem}
+.sec .st{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--signal);white-space:nowrap}
+.sec .sl{flex:1;height:1px;background:var(--rule)}
+.derive{border:1px solid var(--rule);border-radius:11px;background:var(--surface);overflow:hidden}
+.derive-h{padding:.55rem .85rem;background:var(--surface-2);border-bottom:1px solid var(--rule);
+  font-size:.8rem;font-weight:600;color:var(--ink)}
+.dstep{display:grid;grid-template-columns:1.6rem 1fr;gap:.6rem;padding:.7rem .85rem;
+  border-bottom:1px solid var(--rule);align-items:start}
+.dstep:last-child{border-bottom:0}
+.dstep .dn{font-family:var(--font-mono);font-size:.7rem;color:var(--accent);background:var(--accent-soft);
+  border-radius:5px;width:1.6rem;height:1.6rem;display:grid;place-items:center}
+.dstep .dc{min-width:0;display:flex;flex-direction:column;gap:.4rem}
+.dstep .dm{font-family:var(--font-mono);font-size:.92rem;color:var(--ink);background:var(--surface-2);
+  border-radius:7px;padding:.5rem .7rem;overflow-x:auto;white-space:nowrap;text-align:center}
+.dstep .dw{font-size:.85rem;color:var(--ink-2)}
+.calc-note{font-size:.78rem;color:var(--ink-3);margin-top:.35rem}
+
 /* ---------- 測驗 ---------- */
 .quiz{margin-top:2.4rem;border-top:1px solid var(--rule);padding-top:1.7rem}
 .quiz h3{font-size:1.15rem;display:flex;align-items:center;gap:.55rem}
@@ -296,6 +370,15 @@ select,input[type=number]{font:inherit;font-size:.84rem;padding:.3rem .45rem;bor
   .main{padding:0 1rem 4rem}
   .stage-head h2{font-size:1.65rem}
   .hero h2{font-size:2rem}
+}
+@media (max-width:540px){
+  .task{grid-template-columns:auto 1fr}
+  .task .ta{grid-column:1/-1;justify-content:flex-end;margin-top:.15rem}
+  .lab-foot{flex-direction:column;align-items:stretch;gap:.45rem}
+  .lab-foot .foot-btns{justify-content:stretch}
+  .lab-foot .btn{flex:1;text-align:center}
+  .dstep{grid-template-columns:1.4rem 1fr;gap:.45rem;padding:.6rem .6rem}
+  .dstep .dm{font-size:.84rem}
 }
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
@@ -578,6 +661,334 @@ if (typeof module !== 'undefined') module.exports = S;
 </script>
 <script>
 const DATA=[{"id":1,"group":0,"sex":1,"sleep":5.7,"phone":6.5,"pre":56,"post":55,"mem":35},{"id":2,"group":0,"sex":0,"sleep":7.1,"phone":3.4,"pre":48,"post":46,"mem":46},{"id":3,"group":0,"sex":0,"sleep":6.7,"phone":3.0,"pre":44,"post":45,"mem":44},{"id":4,"group":0,"sex":0,"sleep":7.6,"phone":3.6,"pre":65,"post":57,"mem":47},{"id":5,"group":0,"sex":0,"sleep":7.6,"phone":4.7,"pre":59,"post":59,"mem":46},{"id":6,"group":0,"sex":1,"sleep":6.9,"phone":7.3,"pre":52,"post":46,"mem":32},{"id":7,"group":0,"sex":0,"sleep":9.1,"phone":4.2,"pre":53,"post":48,"mem":52},{"id":8,"group":0,"sex":0,"sleep":7.4,"phone":6.2,"pre":61,"post":59,"mem":42},{"id":9,"group":0,"sex":0,"sleep":7.6,"phone":4.6,"pre":50,"post":42,"mem":37},{"id":10,"group":0,"sex":1,"sleep":7.7,"phone":6.3,"pre":41,"post":36,"mem":44},{"id":11,"group":0,"sex":0,"sleep":6.4,"phone":6.2,"pre":60,"post":62,"mem":33},{"id":12,"group":0,"sex":1,"sleep":7.5,"phone":6.0,"pre":55,"post":54,"mem":46},{"id":13,"group":0,"sex":1,"sleep":8.5,"phone":5.8,"pre":41,"post":43,"mem":41},{"id":14,"group":0,"sex":0,"sleep":5.2,"phone":8.1,"pre":53,"post":49,"mem":29},{"id":15,"group":0,"sex":1,"sleep":8.7,"phone":5.9,"pre":57,"post":53,"mem":45},{"id":16,"group":0,"sex":0,"sleep":6.5,"phone":6.2,"pre":52,"post":48,"mem":33},{"id":17,"group":0,"sex":1,"sleep":6.0,"phone":5.7,"pre":54,"post":55,"mem":44},{"id":18,"group":0,"sex":1,"sleep":6.9,"phone":3.4,"pre":45,"post":55,"mem":39},{"id":19,"group":0,"sex":1,"sleep":6.4,"phone":7.8,"pre":53,"post":55,"mem":32},{"id":20,"group":0,"sex":1,"sleep":6.8,"phone":4.0,"pre":66,"post":65,"mem":40},{"id":21,"group":1,"sex":0,"sleep":5.8,"phone":3.9,"pre":43,"post":48,"mem":34},{"id":22,"group":1,"sex":1,"sleep":5.2,"phone":3.1,"pre":46,"post":43,"mem":24},{"id":23,"group":1,"sex":0,"sleep":5.3,"phone":4.9,"pre":45,"post":47,"mem":34},{"id":24,"group":1,"sex":0,"sleep":5.1,"phone":6.7,"pre":56,"post":61,"mem":33},{"id":25,"group":1,"sex":1,"sleep":6.3,"phone":5.3,"pre":51,"post":69,"mem":35},{"id":26,"group":1,"sex":0,"sleep":5.2,"phone":5.6,"pre":51,"post":58,"mem":34},{"id":27,"group":1,"sex":0,"sleep":5.5,"phone":5.4,"pre":47,"post":47,"mem":39},{"id":28,"group":1,"sex":1,"sleep":5.4,"phone":5.6,"pre":55,"post":52,"mem":28},{"id":29,"group":1,"sex":1,"sleep":5.0,"phone":5.3,"pre":49,"post":56,"mem":25},{"id":30,"group":1,"sex":1,"sleep":4.8,"phone":7.3,"pre":60,"post":57,"mem":24},{"id":31,"group":1,"sex":1,"sleep":4.8,"phone":9.3,"pre":59,"post":60,"mem":21},{"id":32,"group":1,"sex":1,"sleep":5.0,"phone":5.6,"pre":50,"post":44,"mem":34},{"id":33,"group":1,"sex":1,"sleep":5.2,"phone":5.8,"pre":47,"post":43,"mem":28},{"id":34,"group":1,"sex":1,"sleep":5.3,"phone":5.2,"pre":45,"post":46,"mem":36},{"id":35,"group":1,"sex":0,"sleep":5.9,"phone":6.3,"pre":57,"post":61,"mem":33},{"id":36,"group":1,"sex":0,"sleep":6.1,"phone":6.2,"pre":37,"post":42,"mem":31},{"id":37,"group":1,"sex":0,"sleep":5.7,"phone":6.3,"pre":55,"post":51,"mem":37},{"id":38,"group":1,"sex":0,"sleep":5.6,"phone":4.9,"pre":51,"post":45,"mem":37},{"id":39,"group":1,"sex":1,"sleep":5.1,"phone":5.3,"pre":55,"post":58,"mem":27},{"id":40,"group":1,"sex":0,"sleep":6.7,"phone":5.6,"pre":50,"post":57,"mem":38},{"id":41,"group":2,"sex":1,"sleep":7.4,"phone":4.1,"pre":51,"post":50,"mem":44},{"id":42,"group":2,"sex":1,"sleep":6.9,"phone":6.5,"pre":62,"post":58,"mem":45},{"id":43,"group":2,"sex":1,"sleep":7.4,"phone":4.2,"pre":53,"post":59,"mem":34},{"id":44,"group":2,"sex":1,"sleep":7.6,"phone":4.2,"pre":46,"post":39,"mem":44},{"id":45,"group":2,"sex":0,"sleep":6.2,"phone":7.8,"pre":57,"post":48,"mem":30},{"id":46,"group":2,"sex":0,"sleep":7.8,"phone":3.6,"pre":55,"post":55,"mem":47},{"id":47,"group":2,"sex":0,"sleep":8.0,"phone":5.4,"pre":56,"post":48,"mem":36},{"id":48,"group":2,"sex":0,"sleep":8.9,"phone":5.8,"pre":52,"post":48,"mem":37},{"id":49,"group":2,"sex":1,"sleep":6.9,"phone":4.7,"pre":41,"post":33,"mem":48},{"id":50,"group":2,"sex":1,"sleep":7.2,"phone":5.9,"pre":48,"post":44,"mem":31},{"id":51,"group":2,"sex":0,"sleep":7.5,"phone":3.4,"pre":60,"post":55,"mem":38},{"id":52,"group":2,"sex":0,"sleep":7.5,"phone":7.0,"pre":57,"post":42,"mem":39},{"id":53,"group":2,"sex":1,"sleep":7.1,"phone":6.5,"pre":48,"post":41,"mem":42},{"id":54,"group":2,"sex":1,"sleep":7.0,"phone":5.2,"pre":56,"post":52,"mem":38},{"id":55,"group":2,"sex":1,"sleep":8.0,"phone":4.0,"pre":52,"post":51,"mem":40},{"id":56,"group":2,"sex":0,"sleep":6.7,"phone":4.9,"pre":56,"post":49,"mem":36},{"id":57,"group":2,"sex":0,"sleep":7.6,"phone":6.0,"pre":65,"post":58,"mem":40},{"id":58,"group":2,"sex":0,"sleep":7.6,"phone":5.2,"pre":67,"post":68,"mem":39},{"id":59,"group":2,"sex":0,"sleep":8.1,"phone":4.6,"pre":57,"post":55,"mem":38},{"id":60,"group":2,"sex":1,"sleep":7.9,"phone":4.9,"pre":43,"post":36,"mem":44}];
+
+</script>
+<script>
+/* ===================== 迷你 Excel 公式引擎 ===================== */
+const FX=(()=>{
+  const ERR=['#DIV/0!','#VALUE!','#NAME?','#REF!','#NUM!','#N/A','#CIRC!'];
+  const isErr=v=>typeof v==='string'&&ERR.indexOf(v)>=0;
+  const colName=i=>{let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=(i-m-1)/26;}return s;};
+  const colIndex=s=>{let n=0;for(const c of s.toUpperCase())n=n*26+(c.charCodeAt(0)-64);return n-1;};
+
+  /* ---- 詞法分析 ---- */
+  function lex(src){
+    const t=[]; let i=0;
+    const isD=c=>c>='0'&&c<='9';
+    while(i<src.length){
+      const c=src[i];
+      if(c===' '||c==='\t'){i++;continue;}
+      if(isD(c)||(c==='.'&&isD(src[i+1]))){
+        let j=i; while(j<src.length&&(isD(src[j])||src[j]==='.'))j++;
+        if(src[j]==='E'||src[j]==='e'){let k=j+1;if(src[k]==='+'||src[k]==='-')k++;if(isD(src[k])){j=k;while(j<src.length&&isD(src[j]))j++;}}
+        t.push({k:'num',v:parseFloat(src.slice(i,j))}); i=j; continue;
+      }
+      if(c==='"'){let j=i+1,s='';while(j<src.length){if(src[j]==='"'&&src[j+1]==='"'){s+='"';j+=2;continue;}
+        if(src[j]==='"')break; s+=src[j++];} t.push({k:'str',v:s}); i=j+1; continue;}
+      if(/[A-Za-z_$]/.test(c)){
+        let j=i; while(j<src.length&&/[A-Za-z0-9_$.]/.test(src[j]))j++;
+        let w=src.slice(i,j);
+        // 函數？
+        let p=j; while(src[p]===' ')p++;
+        if(src[p]==='('){t.push({k:'fn',v:w.toUpperCase().replace(/\$/g,'')});i=p;continue;}
+        const m=/^\$?([A-Za-z]{1,3})\$?([0-9]{1,5})$/.exec(w);
+        if(m){t.push({k:'ref',c:colIndex(m[1]),r:parseInt(m[2],10)-1});i=j;continue;}
+        const u=w.toUpperCase();
+        if(u==='TRUE'||u==='FALSE'){t.push({k:'bool',v:u==='TRUE'});i=j;continue;}
+        t.push({k:'name',v:u}); i=j; continue;
+      }
+      if('()+-*/^,:%&'.indexOf(c)>=0){t.push({k:c});i++;continue;}
+      if(c==='<'){if(src[i+1]==='>'){t.push({k:'<>'});i+=2;}else if(src[i+1]==='='){t.push({k:'<='});i+=2;}else{t.push({k:'<'});i++;}continue;}
+      if(c==='>'){if(src[i+1]==='='){t.push({k:'>='});i+=2;}else{t.push({k:'>'});i++;}continue;}
+      if(c==='='){t.push({k:'='});i++;continue;}
+      throw {fx:'#VALUE!'};
+    }
+    return t;
+  }
+
+  /* ---- 語法分析 ---- */
+  function parse(tokens){
+    let p=0;
+    const peek=()=>tokens[p], eat=k=>{if(!tokens[p]||tokens[p].k!==k)throw {fx:'#VALUE!'};return tokens[p++];};
+    function expr(){ let l=concat();
+      while(peek()&&['=','<>','<','<=','>','>='].indexOf(peek().k)>=0){const op=tokens[p++].k;l={n:'cmp',op,l,r:concat()};}
+      return l;}
+    function concat(){ let l=add(); while(peek()&&peek().k==='&'){p++;l={n:'cat',l,r:add()};} return l;}
+    function add(){ let l=mul();
+      while(peek()&&(peek().k==='+'||peek().k==='-')){const op=tokens[p++].k;l={n:'bin',op,l,r:mul()};} return l;}
+    function mul(){ let l=pow();
+      while(peek()&&(peek().k==='*'||peek().k==='/')){const op=tokens[p++].k;l={n:'bin',op,l,r:pow()};} return l;}
+    function pow(){ let l=unary();
+      while(peek()&&peek().k==='^'){p++;l={n:'bin',op:'^',l,r:unary()};} return l;}
+    function unary(){
+      if(peek()&&(peek().k==='-'||peek().k==='+')){const op=tokens[p++].k;return {n:'neg',op,v:unary()};}
+      return postfix();}
+    function postfix(){ let v=primary();
+      while(peek()&&peek().k==='%'){p++;v={n:'pct',v};} return v;}
+    function primary(){
+      const t=peek(); if(!t)throw {fx:'#VALUE!'};
+      if(t.k==='num'){p++;return {n:'num',v:t.v};}
+      if(t.k==='str'){p++;return {n:'str',v:t.v};}
+      if(t.k==='bool'){p++;return {n:'bool',v:t.v};}
+      if(t.k==='('){p++;const e=expr();eat(')');return e;}
+      if(t.k==='fn'){p++;eat('(');const args=[];
+        if(peek()&&peek().k!==')'){args.push(expr());while(peek()&&peek().k===','){p++;args.push(expr());}}
+        eat(')');return {n:'fn',name:t.v,args};}
+      if(t.k==='ref'){p++;
+        if(peek()&&peek().k===':'&&tokens[p+1]&&tokens[p+1].k==='ref'){
+          p++;const b=tokens[p++];return {n:'rng',c1:Math.min(t.c,b.c),r1:Math.min(t.r,b.r),c2:Math.max(t.c,b.c),r2:Math.max(t.r,b.r)};}
+        return {n:'ref',c:t.c,r:t.r};}
+      if(t.k==='name')throw {fx:'#NAME?'};
+      throw {fx:'#VALUE!'};
+    }
+    const e=expr(); if(p<tokens.length)throw {fx:'#VALUE!'};
+    return e;
+  }
+
+  /* ---- 數值輔助 ---- */
+  const num=v=>{ if(isErr(v))throw {fx:v};
+    if(v===null||v===undefined||v==='')return 0;
+    if(typeof v==='boolean')return v?1:0;
+    if(typeof v==='number')return v;
+    const f=parseFloat(v); if(isNaN(f))throw {fx:'#VALUE!'}; return f;};
+  const flat=a=>{const out=[];(Array.isArray(a)?a:[a]).forEach(v=>{
+    if(v&&v.__range)v.vals.forEach(x=>out.push(x)); else if(Array.isArray(v))v.forEach(x=>out.push(x)); else out.push(v);});return out;};
+  const nums=args=>{const o=[];flat(args).forEach(v=>{
+    if(isErr(v))throw {fx:v};
+    if(typeof v==='number')o.push(v);
+    else if(typeof v==='string'&&v!==''&&!isNaN(parseFloat(v))&&/^-?[\d.]+$/.test(v.trim()))o.push(parseFloat(v));});
+    return o;};
+  const S_=()=>(typeof S!=='undefined'?S:require('./statlib.js'));
+  const need=(a,n)=>{if(a.length<n)throw {fx:'#VALUE!'};};
+  function matcher(crit){
+    if(crit&&crit.__range)crit=crit.vals[0];
+    if(typeof crit==='number')return v=>typeof v==='number'&&v===crit;
+    const s=String(crit).trim();
+    const m=/^(>=|<=|<>|>|<|=)?(.*)$/.exec(s), op=m[1]||'=', rest=m[2].trim();
+    const rn=parseFloat(rest), isn=rest!==''&&!isNaN(rn)&&/^-?[\d.]+$/.test(rest);
+    return v=>{
+      if(isn){ const x=typeof v==='number'?v:parseFloat(v);
+        if(isNaN(x))return op==='<>';
+        switch(op){case '>':return x>rn;case '<':return x<rn;case '>=':return x>=rn;
+          case '<=':return x<=rn;case '<>':return x!==rn;default:return x===rn;}}
+      const a=String(v).toUpperCase(), b=rest.toUpperCase();
+      return op==='<>'?a!==b:a===b;};
+  }
+
+  /* ---- 函數庫 ---- */
+  const F={};
+  const def=(names,fn)=>names.split(' ').forEach(n=>F[n]=fn);
+  def('SUM',a=>nums(a).reduce((x,y)=>x+y,0));
+  def('PRODUCT',a=>nums(a).reduce((x,y)=>x*y,1));
+  def('SUMSQ',a=>nums(a).reduce((x,y)=>x+y*y,0));
+  def('COUNT',a=>nums(a).length);
+  def('COUNTA',a=>flat(a).filter(v=>v!==''&&v!==null&&v!==undefined).length);
+  def('AVERAGE',a=>{const n=nums(a);if(!n.length)throw {fx:'#DIV/0!'};return S_().mean(n);});
+  def('MEDIAN',a=>{const n=nums(a);if(!n.length)throw {fx:'#NUM!'};return S_().median(n);});
+  def('MODE.SNGL MODE',a=>{const n=nums(a),c={};let best=null,bc=1;
+    n.forEach(v=>{c[v]=(c[v]||0)+1;});n.forEach(v=>{if(c[v]>bc){bc=c[v];best=v;}});
+    if(best===null)throw {fx:'#N/A'};return best;});
+  def('MAX',a=>{const n=nums(a);return n.length?Math.max(...n):0;});
+  def('MIN',a=>{const n=nums(a);return n.length?Math.min(...n):0;});
+  def('VAR.S VAR',a=>{const n=nums(a);if(n.length<2)throw {fx:'#DIV/0!'};return S_().variance(n);});
+  def('STDEV.S STDEV',a=>{const n=nums(a);if(n.length<2)throw {fx:'#DIV/0!'};return S_().sd(n);});
+  def('VAR.P VARP',a=>{const n=nums(a);if(!n.length)throw {fx:'#DIV/0!'};const m=S_().mean(n);
+    return n.reduce((s,x)=>s+(x-m)*(x-m),0)/n.length;});
+  def('STDEV.P STDEVP',a=>Math.sqrt(F['VAR.P'](a)));
+  def('DEVSQ',a=>{const n=nums(a),m=S_().mean(n);return n.reduce((s,x)=>s+(x-m)*(x-m),0);});
+  def('SKEW',a=>S_().skewness(nums(a)));
+  def('KURT',a=>S_().kurtosis(nums(a)));
+  def('QUARTILE.INC QUARTILE',a=>{need(a,2);return S_().quantile(nums(a[0]),num(scalar(a[1]))/4);});
+  def('PERCENTILE.INC PERCENTILE',a=>{need(a,2);return S_().quantile(nums(a[0]),num(scalar(a[1])));});
+  def('LARGE',a=>{need(a,2);const n=S_().sortAsc(nums(a[0]));return n[n.length-num(scalar(a[1]))];});
+  def('SMALL',a=>{need(a,2);return S_().sortAsc(nums(a[0]))[num(scalar(a[1]))-1];});
+  def('TRIMMEAN',a=>{need(a,2);const n=S_().sortAsc(nums(a[0])),k=Math.floor(n.length*num(scalar(a[1]))/2);
+    return S_().mean(n.slice(k,n.length-k));});
+  def('RANK.AVG',a=>{need(a,2);const x=num(scalar(a[0])),arr=nums(a[1]),asc=a.length>2&&num(scalar(a[2]))!==0;
+    const r=S_().rank(arr), i=arr.indexOf(x); if(i<0)throw {fx:'#N/A'};
+    return asc?r[i]:arr.length+1-r[i];});
+  def('ABS',a=>Math.abs(num(scalar(a[0]))));
+  def('SQRT',a=>{const v=num(scalar(a[0]));if(v<0)throw {fx:'#NUM!'};return Math.sqrt(v);});
+  def('POWER',a=>{need(a,2);return Math.pow(num(scalar(a[0])),num(scalar(a[1])));});
+  def('EXP',a=>Math.exp(num(scalar(a[0]))));
+  def('LN',a=>{const v=num(scalar(a[0]));if(v<=0)throw {fx:'#NUM!'};return Math.log(v);});
+  def('LOG10',a=>{const v=num(scalar(a[0]));if(v<=0)throw {fx:'#NUM!'};return Math.log10(v);});
+  def('SIGN',a=>Math.sign(num(scalar(a[0]))));
+  def('INT',a=>Math.floor(num(scalar(a[0]))));
+  def('ROUND',a=>{need(a,2);const d=num(scalar(a[1])),m=Math.pow(10,d);
+    const v=num(scalar(a[0]));return Math.round((v+(v>=0?1:-1)*1e-12)*m)/m;});
+  def('SUMPRODUCT',a=>{const arrs=a.map(x=>flat(x).map(v=>typeof v==='number'?v:(v===''||v===null?0:(isNaN(parseFloat(v))?0:parseFloat(v)))));
+    const n=arrs[0].length; let s=0;
+    for(let i=0;i<n;i++){let p=1;for(const ar of arrs)p*=(ar[i]||0);s+=p;} return s;});
+  def('IF',a=>{need(a,2);const c=truth(scalar(a[0]));
+    return c?scalar(a[1]):(a.length>2?scalar(a[2]):false);});
+  def('IFERROR',a=>{need(a,2);try{const v=scalar(a[0]);return isErr(v)?scalar(a[1]):v;}catch(e){return scalar(a[1]);}});
+  def('AND',a=>flat(a).every(v=>truth(v)));
+  def('OR',a=>flat(a).some(v=>truth(v)));
+  def('NOT',a=>!truth(scalar(a[0])));
+  def('CHOOSE',a=>{const i=num(scalar(a[0]));if(i<1||i>=a.length)throw {fx:'#VALUE!'};return scalar(a[i]);});
+  def('COUNTIF',a=>{need(a,2);const m=matcher(a[1]);return flat(a[0]).filter(m).length;});
+  def('SUMIF',a=>{need(a,2);const m=matcher(a[1]),r=flat(a[0]),s=a.length>2?flat(a[2]):r;
+    let t=0;r.forEach((v,i)=>{if(m(v)&&typeof s[i]==='number')t+=s[i];});return t;});
+  def('AVERAGEIF',a=>{need(a,2);const m=matcher(a[1]),r=flat(a[0]),s=a.length>2?flat(a[2]):r;
+    const o=[];r.forEach((v,i)=>{if(m(v)&&typeof s[i]==='number')o.push(s[i]);});
+    if(!o.length)throw {fx:'#DIV/0!'};return S_().mean(o);});
+  def('COUNTIFS',a=>{const n=flat(a[0]).length;let c=0;
+    for(let i=0;i<n;i++){let ok=true;
+      for(let k=0;k<a.length;k+=2){const m=matcher(a[k+1]);if(!m(flat(a[k])[i])){ok=false;break;}}
+      if(ok)c++;} return c;});
+  def('AVERAGEIFS',a=>{const s=flat(a[0]),n=s.length,o=[];
+    for(let i=0;i<n;i++){let ok=true;
+      for(let k=1;k<a.length;k+=2){const m=matcher(a[k+1]);if(!m(flat(a[k])[i])){ok=false;break;}}
+      if(ok&&typeof s[i]==='number')o.push(s[i]);}
+    if(!o.length)throw {fx:'#DIV/0!'};return S_().mean(o);});
+  const pair=a=>{need(a,2);const x=flat(a[0]),y=flat(a[1]),X=[],Y=[];
+    for(let i=0;i<Math.min(x.length,y.length);i++){
+      if(typeof x[i]==='number'&&typeof y[i]==='number'){X.push(x[i]);Y.push(y[i]);}}
+    if(X.length<2)throw {fx:'#DIV/0!'};return [X,Y];};
+  def('CORREL PEARSON',a=>{const [x,y]=pair(a);return S_().pearson(x,y).r;});
+  def('RSQ',a=>{const [x,y]=pair(a);const r=S_().pearson(x,y).r;return r*r;});
+  def('SLOPE',a=>{const [y,x]=pair(a);return S_().regress(y,[x]).beta[1];});
+  def('INTERCEPT',a=>{const [y,x]=pair(a);return S_().regress(y,[x]).beta[0];});
+  def('STEYX',a=>{const [y,x]=pair(a);return S_().regress(y,[x]).seEst;});
+  def('FORECAST.LINEAR FORECAST',a=>{need(a,3);const [y,x]=pair([a[1],a[2]]);
+    const r=S_().regress(y,[x]);return r.beta[0]+r.beta[1]*num(scalar(a[0]));});
+  def('STANDARDIZE',a=>{need(a,3);const s=num(scalar(a[2]));if(s<=0)throw {fx:'#NUM!'};
+    return (num(scalar(a[0]))-num(scalar(a[1])))/s;});
+  def('CONFIDENCE.T',a=>{need(a,3);const al=num(scalar(a[0])),sd=num(scalar(a[1])),n=num(scalar(a[2]));
+    return S_().qt(1-al/2,n-1)*sd/Math.sqrt(n);});
+  def('CONFIDENCE.NORM CONFIDENCE',a=>{need(a,3);const al=num(scalar(a[0])),sd=num(scalar(a[1])),n=num(scalar(a[2]));
+    return S_().qnorm(1-al/2)*sd/Math.sqrt(n);});
+  def('NORM.DIST NORMDIST',a=>{need(a,4);const x=num(scalar(a[0])),m=num(scalar(a[1])),s=num(scalar(a[2]));
+    return truth(scalar(a[3]))?S_().pnorm(x,m,s):S_().dnorm(x,m,s);});
+  def('NORM.S.DIST',a=>{const z=num(scalar(a[0]));
+    return (a.length>1&&!truth(scalar(a[1])))?S_().dnorm(z):S_().pnorm(z);});
+  def('NORMSDIST',a=>S_().pnorm(num(scalar(a[0]))));
+  def('NORM.INV NORMINV',a=>{need(a,3);return num(scalar(a[1]))+S_().qnorm(num(scalar(a[0])))*num(scalar(a[2]));});
+  def('NORM.S.INV NORMSINV',a=>S_().qnorm(num(scalar(a[0]))));
+  def('T.DIST',a=>{need(a,3);const t=num(scalar(a[0])),d=num(scalar(a[1]));
+    return truth(scalar(a[2]))?S_().pt(t,d):S_().dt(t,d);});
+  def('T.DIST.2T',a=>{need(a,2);const t=num(scalar(a[0]));if(t<0)throw {fx:'#NUM!'};
+    return 2*(1-S_().pt(t,num(scalar(a[1]))));});
+  def('T.DIST.RT',a=>{need(a,2);return 1-S_().pt(num(scalar(a[0])),num(scalar(a[1])));});
+  def('T.INV',a=>{need(a,2);return S_().qt(num(scalar(a[0])),num(scalar(a[1])));});
+  def('T.INV.2T',a=>{need(a,2);return S_().qt(1-num(scalar(a[0]))/2,num(scalar(a[1])));});
+  def('F.DIST.RT',a=>{need(a,3);return 1-S_().pf(num(scalar(a[0])),num(scalar(a[1])),num(scalar(a[2])));});
+  def('F.INV.RT',a=>{need(a,3);const p=num(scalar(a[0])),d1=num(scalar(a[1])),d2=num(scalar(a[2]));
+    let lo=0,hi=1000;for(let i=0;i<200;i++){const m=(lo+hi)/2;if(1-S_().pf(m,d1,d2)>p)lo=m;else hi=m;}return (lo+hi)/2;});
+  def('CHISQ.DIST.RT',a=>{need(a,2);return 1-S_().pchisq(num(scalar(a[0])),num(scalar(a[1])));});
+  def('CHISQ.INV.RT',a=>{need(a,2);const p=num(scalar(a[0])),k=num(scalar(a[1]));
+    let lo=0,hi=1000;for(let i=0;i<200;i++){const m=(lo+hi)/2;if(1-S_().pchisq(m,k)>p)lo=m;else hi=m;}return (lo+hi)/2;});
+  def('CHISQ.TEST CHITEST',a=>{need(a,2);const o=nums(a[0]),e=nums(a[1]);
+    let x2=0;o.forEach((v,i)=>{if(!e[i])throw {fx:'#DIV/0!'};x2+=(v-e[i])*(v-e[i])/e[i];});
+    const r0=a[0].__range?(a[0].r2-a[0].r1+1):o.length, c0=a[0].__range?(a[0].c2-a[0].c1+1):1;
+    const df=(r0>1&&c0>1)?(r0-1)*(c0-1):Math.max(1,o.length-1);
+    return 1-S_().pchisq(x2,df);});
+  def('T.TEST TTEST',a=>{need(a,4);const x=nums(a[0]),y=nums(a[1]);
+    const tails=num(scalar(a[2])), type=num(scalar(a[3]));
+    let r;
+    if(type===1){ if(x.length!==y.length)throw {fx:'#N/A'}; r=S_().tTestPaired(x,y);}
+    else r=S_().tTestInd(x,y,type===3);
+    return tails===1?r.p/2:r.p;});
+  def('F.TEST FTEST',a=>{need(a,2);const x=nums(a[0]),y=nums(a[1]);
+    const v1=S_().variance(x),v2=S_().variance(y);
+    const f=v1/v2, d1=x.length-1, d2=y.length-1;
+    const p=f>1?1-S_().pf(f,d1,d2):S_().pf(f,d1,d2);
+    return 2*p;});
+  def('Z.TEST ZTEST',a=>{need(a,2);const x=nums(a[0]),m=num(scalar(a[1]));
+    const s=a.length>2?num(scalar(a[2])):S_().sd(x);
+    return 1-S_().pnorm((S_().mean(x)-m)/(s/Math.sqrt(x.length)));});
+  def('FISHER',a=>{const r=num(scalar(a[0]));return .5*Math.log((1+r)/(1-r));});
+  def('FISHERINV',a=>Math.tanh(num(scalar(a[0]))));
+
+  function truth(v){ if(isErr(v))throw {fx:v};
+    if(typeof v==='boolean')return v; if(typeof v==='number')return v!==0;
+    if(v===''||v===null||v===undefined)return false;
+    const s=String(v).toUpperCase(); if(s==='TRUE')return true; if(s==='FALSE')return false;
+    return !!v;}
+  function scalar(v){ if(v&&v.__range)return v.vals.length?v.vals[0]:''; return v;}
+
+  /* ---- 求值 ---- */
+  function evalNode(node,ctx){
+    switch(node.n){
+      case 'num': return node.v;
+      case 'str': return node.v;
+      case 'bool': return node.v;
+      case 'neg': {const v=num(scalar(evalNode(node.v,ctx)));return node.op==='-'?-v:v;}
+      case 'pct': return num(scalar(evalNode(node.v,ctx)))/100;
+      case 'cat': return String(disp(scalar(evalNode(node.l,ctx))))+String(disp(scalar(evalNode(node.r,ctx))));
+      case 'bin': {
+        const a=num(scalar(evalNode(node.l,ctx))), b=num(scalar(evalNode(node.r,ctx)));
+        switch(node.op){case '+':return a+b;case '-':return a-b;case '*':return a*b;
+          case '/':if(b===0)throw {fx:'#DIV/0!'};return a/b;
+          case '^':{const r=Math.pow(a,b);if(!isFinite(r))throw {fx:'#NUM!'};return r;}}
+        throw {fx:'#VALUE!'};}
+      case 'cmp': {
+        let a=scalar(evalNode(node.l,ctx)), b=scalar(evalNode(node.r,ctx));
+        if(isErr(a))throw {fx:a}; if(isErr(b))throw {fx:b};
+        if(typeof a==='number'&&typeof b==='number'){}
+        else if(typeof a==='boolean'||typeof b==='boolean'){a=truth(a);b=truth(b);}
+        else if(typeof a!=='number'||typeof b!=='number'){a=String(a).toUpperCase();b=String(b).toUpperCase();}
+        switch(node.op){case '=':return a===b;case '<>':return a!==b;case '<':return a<b;
+          case '<=':return a<=b;case '>':return a>b;case '>=':return a>=b;}
+        throw {fx:'#VALUE!'};}
+      case 'ref': return ctx.get(node.c,node.r);
+      case 'rng': {
+        const vals=[];
+        for(let r=node.r1;r<=node.r2;r++)for(let c=node.c1;c<=node.c2;c++)vals.push(ctx.get(c,r));
+        return {__range:true,vals,r1:node.r1,r2:node.r2,c1:node.c1,c2:node.c2};}
+      case 'fn': {
+        const f=F[node.name]; if(!f)throw {fx:'#NAME?'};
+        if(node.name==='IF'||node.name==='IFERROR'){
+          const lazy=node.args.map(a=>()=>evalNode(a,ctx));
+          if(node.name==='IF'){const c=truth(scalar(lazy[0]()));
+            return c?scalar(lazy[1]()):(lazy.length>2?scalar(lazy[2]()):false);}
+          try{const v=scalar(lazy[0]());return isErr(v)?scalar(lazy[1]()):v;}catch(e){return scalar(lazy[1]());}}
+        return f(node.args.map(a=>evalNode(a,ctx)));}
+    }
+    throw {fx:'#VALUE!'};
+  }
+  const disp=v=>{ if(v===null||v===undefined)return '';
+    if(typeof v==='boolean')return v?'TRUE':'FALSE'; return v;};
+
+  /* ---- 工作表 ---- */
+  function makeBook(){
+    const raw={};            // "c,r" -> 原始輸入（字串）
+    const cache={};          // "c,r" -> 值
+    const stack=[];
+    const key=(c,r)=>c+','+r;
+    const ctx={get(c,r){
+      const k=key(c,r);
+      if(cache.hasOwnProperty(k))return cache[k];
+      if(stack.indexOf(k)>=0)throw {fx:'#CIRC!'};
+      const src=raw[k];
+      if(src===undefined||src===null||src==='')return '';
+      if(typeof src==='number')return src;
+      const s=String(src);
+      if(s[0]!=='='){ const f=parseFloat(s);
+        const v=(s.trim()!==''&&!isNaN(f)&&/^-?[\d.]+(e-?\d+)?$/i.test(s.trim()))?f:s;
+        cache[k]=v; return v;}
+      stack.push(k);
+      let v;
+      try{ v=scalar(evalNode(parse(lex(s.slice(1))),ctx)); }
+      catch(e){ v=e&&e.fx?e.fx:'#VALUE!'; }
+      stack.pop();
+      cache[k]=v; return v;
+    }};
+    return {
+      set(c,r,v){raw[key(c,r)]=v;for(const k in cache)delete cache[k];},
+      setRef(ref,v){const m=/^([A-Za-z]+)([0-9]+)$/.exec(ref);this.set(colIndex(m[1]),parseInt(m[2],10)-1,v);},
+      getRaw(c,r){const v=raw[key(c,r)];return v===undefined?'':v;},
+      getRawRef(ref){const m=/^([A-Za-z]+)([0-9]+)$/.exec(ref);return this.getRaw(colIndex(m[1]),parseInt(m[2],10)-1);},
+      value(c,r){try{return ctx.get(c,r);}catch(e){return e&&e.fx?e.fx:'#VALUE!';}},
+      valueRef(ref){const m=/^([A-Za-z]+)([0-9]+)$/.exec(ref);
+        if(!m)return '#REF!';return this.value(colIndex(m[1]),parseInt(m[2],10)-1);},
+      clearCache(){for(const k in cache)delete cache[k];}
+    };
+  }
+  return {makeBook,colName,colIndex,isErr,disp,FUNCS:Object.keys(F)};
+})();
+if(typeof module!=='undefined')module.exports=FX;
 
 </script>
 <script>
@@ -1678,6 +2089,1521 @@ STAGES.push(
 
 </script>
 <script>
+/* ===================== 手算資料集 ===================== */
+const MINI={
+  A:[34,41,38,45,30,36,43,37],
+  G1:[41,38,45,36,40], G2:[30,33,28,35,31],
+  G3:[[42,38,45,39],[31,28,34,30],[40,44,37,41]],
+  XY:[[5.5,31],[6.2,35],[6.8,38],[7.1,40],[7.5,43],[8.2,47]],
+  PP:[[58,52],[61,55],[49,47],[55,48],[62,53]],
+  CT:[[12,8],[5,15]]
+};
+const F2=(v,d)=>(v===null||!isFinite(v))?'—':v.toFixed(d===undefined?2:d);
+
+/* ===================== 深入：推導卡 ===================== */
+function deriveEl(b){
+  const box=E('div','derive');
+  box.appendChild(E('div','derive-h',b.title));
+  b.steps.forEach((s,i)=>{
+    const row=E('div','dstep');
+    row.appendChild(E('div','dn',String(i+1)));
+    const c=E('div','dc');
+    if(s.m)c.appendChild(E('div','dm',s.m));
+    if(s.w)c.appendChild(E('div','dw',s.w));
+    row.appendChild(c); box.appendChild(row);
+  });
+  return box;
+}
+function secEl(b){
+  const d=E('div','sec');
+  d.appendChild(E('span','st',b.label));
+  d.appendChild(E('span','sl'));
+  return d;
+}
+
+/* ===================== 手算表 ===================== */
+const HANDS={};
+function handEl(k){const f=HANDS[k];return f?f():E('div');}
+function handBox(title,sub,inner,foot){
+  const box=E('div','out');
+  box.appendChild(E('div','out-head','<span>'+title+'</span><span>'+(sub||'')+'</span>'));
+  const w=E('div','tbl-wrap'); w.innerHTML=inner; box.appendChild(w);
+  if(foot&&foot.length){const r=E('div','read');
+    foot.forEach(([a,b])=>{const row=E('div','read-row');row.appendChild(E('span','read-key',a));
+      row.appendChild(E('span',null,b));r.appendChild(row);});box.appendChild(r);}
+  return box;
+}
+
+HANDS.sd=()=>{
+  const a=MINI.A, n=a.length, m=S.mean(a);
+  const rows=a.map((x,i)=>[i+1,x,F2(x-m),F2((x-m)*(x-m),3)]);
+  const ss=S.sum(a.map(x=>(x-m)*(x-m)));
+  rows.push(['<b>Σ</b>','<b>'+S.sum(a)+'</b>','<b>'+F2(S.sum(a.map(x=>x-m)),3)+'</b>','<b>'+F2(ss,3)+'</b>']);
+  return handBox('手算：變異數與標準差','8 位受試者的記憶分數',
+    '<table>'+TH(['#','X','X − M','(X − M)²'],[0,1,2,3])+TR(rows,[0,1,2,3])+'</table>',
+    [['M','ΣX ÷ n = '+S.sum(a)+' ÷ '+n+' = <b>'+F2(m)+'</b>'],
+     ['檢查','第三欄的總和一定是 0（在捨入誤差內）。這是平均數的定義性質，也是最快的自我檢查。'],
+     ['SS','Σ(X − M)² = <b>'+F2(ss,3)+'</b>　這就是「離差平方和」，之後 ANOVA 和迴歸會一直看到它。'],
+     ['s²','SS ÷ (n − 1) = '+F2(ss,3)+' ÷ '+(n-1)+' = <b>'+F2(S.variance(a),4)+'</b>'],
+     ['s','√s² = <b>'+F2(S.sd(a),4)+'</b>'],
+     ['對照','若誤用母體公式 SS ÷ n = '+F2(ss/n,4)+'，標準差會變成 '+F2(Math.sqrt(ss/n),4)+
+      '，比正確值小了 '+F2((1-Math.sqrt(ss/n)/S.sd(a))*100,1)+'%。n 越小差越多。']]);
+};
+HANDS.quartile=()=>{
+  const a=S.sortAsc(MINI.A), n=a.length;
+  const pos=p=>(n-1)*p;
+  const rows=[['Q1 (p = .25)',F2(pos(.25),2),'第 '+(Math.floor(pos(.25))+1)+' 與第 '+(Math.ceil(pos(.25))+1)+' 個之間',F2(S.quantile(a,.25),3)],
+    ['Mdn (p = .50)',F2(pos(.5),2),'第 '+(Math.floor(pos(.5))+1)+' 與第 '+(Math.ceil(pos(.5))+1)+' 個之間',F2(S.quantile(a,.5),3)],
+    ['Q3 (p = .75)',F2(pos(.75),2),'第 '+(Math.floor(pos(.75))+1)+' 與第 '+(Math.ceil(pos(.75))+1)+' 個之間',F2(S.quantile(a,.75),3)]];
+  return handBox('手算：四分位數與盒鬚圖的鬍鬚','先排序：'+a.join('、'),
+    '<table>'+TH(['統計量','位置 (n−1)p','落在哪兩個值之間','結果'],[1,3])+TR(rows,[1,3])+'</table>',
+    [['位置公式','Excel 的 <code>QUARTILE.INC</code> 用 (n − 1)p 當「從 0 起算的位置」，非整數就在相鄰兩值之間做線性內插。'],
+     ['IQR','Q3 − Q1 = '+F2(S.quantile(a,.75),3)+' − '+F2(S.quantile(a,.25),3)+' = <b>'+F2(S.quantile(a,.75)-S.quantile(a,.25),3)+'</b>'],
+     ['離群值界線','下界 Q1 − 1.5×IQR = '+F2(S.quantile(a,.25)-1.5*(S.quantile(a,.75)-S.quantile(a,.25)),3)+
+      '；上界 Q3 + 1.5×IQR = '+F2(S.quantile(a,.75)+1.5*(S.quantile(a,.75)-S.quantile(a,.25)),3)+
+      '。這組資料沒有任何一筆落在界線外，所以盒鬚圖不會有離群點。'],
+     ['注意','SPSS 預設用的是另一種分位數演算法（Tukey hinges），Q1／Q3 可能和 Excel 差一點點。這不是誰算錯，是定義不同。']]);
+};
+HANDS.z=()=>{
+  const a=MINI.A, m=S.mean(a), s=S.sd(a);
+  const rows=a.map(x=>[x,F2(x-m),F2((x-m)/s,3),F2(S.pnorm((x-m)/s)*100,1)+'%']);
+  return handBox('手算：把原始分數轉成 z','M = '+F2(m)+'　SD = '+F2(s,3),
+    '<table>'+TH(['X','X − M','z','常態下的百分等級'],[0,1,2,3])+TR(rows,[0,1,2,3])+'</table>',
+    [['公式','z = (X − M) ÷ SD。分子告訴你「離平均多遠」，除以 SD 把它換算成「幾個標準差」。'],
+     ['自我檢查','所有 z 的平均一定是 0，標準差一定是 1：實際算出來是 M<sub>z</sub> = '+
+      F2(S.mean(a.map(x=>(x-m)/s)),6)+'，SD<sub>z</sub> = '+F2(S.sd(a.map(x=>(x-m)/s)),6)+'。'],
+     ['百分等級','最右欄是「假設母體常態」時的 PR。如果分配不常態，這一欄就不能這樣算——z 分數本身永遠成立，但把 z 翻成百分比需要常態假設。']]);
+};
+HANDS.se=()=>{
+  const a=MINI.A, n=a.length, m=S.mean(a), s=S.sd(a), se=s/Math.sqrt(n), t=S.qt(.975,n-1);
+  return handBox('手算：標準誤與 95% 信賴區間','同一組 8 筆資料',
+    '<table>'+TR([
+      ['n（樣本數）',n],['M（樣本平均數）',F2(m,4)],['s（樣本標準差）',F2(s,4)],
+      ['√n',F2(Math.sqrt(n),4)],['SE = s ÷ √n','<b>'+F2(se,4)+'</b>'],
+      ['df = n − 1',n-1],['t<sub>.975, '+(n-1)+'</sub>（臨界值）',F2(t,4)],
+      ['誤差界限 = t × SE',F2(t*se,4)],
+      ['95% CI 下界 = M − t×SE','<b>'+F2(m-t*se,3)+'</b>'],
+      ['95% CI 上界 = M + t×SE','<b>'+F2(m+t*se,3)+'</b>']],[1])+'</table>',
+    [['SE vs SD','SD = '+F2(s,3)+' 描述「這 8 個人彼此差多少」；SE = '+F2(se,3)+
+      ' 描述「這個平均數有多不準」。兩者差了 √8 = '+F2(Math.sqrt(n),3)+' 倍。'],
+     ['如果 n 變成 32','SE 會變成 '+F2(s/Math.sqrt(32),4)+'，剛好是現在的一半——樣本數變 4 倍，精確度才提升 2 倍。'],
+     ['為什麼用 t 不用 z','母體 σ 未知、要用樣本 s 去估，多了一層不確定性，所以臨界值要比 1.96 大一點。n = 8 時是 '+
+      F2(t,3)+'，n = 60 時降到 '+F2(S.qt(.975,59),3)+'，n → ∞ 時趨近 1.96。']]);
+};
+HANDS.t1=()=>{
+  const a=MINI.A, n=a.length, m=S.mean(a), s=S.sd(a), mu=40;
+  const r=S.tTest1(a,mu);
+  return handBox('手算：單一樣本 t 檢定','H₀：母體平均數 = 40 分',
+    '<table>'+TR([
+      ['① 樣本平均數 M',F2(m,4)],['② 虛無假設的值 μ₀',mu],
+      ['③ 差異 M − μ₀','<b>'+F2(m-mu,4)+'</b>'],
+      ['④ 樣本標準差 s',F2(s,4)],['⑤ 標準誤 SE = s/√n',F2(r.se,4)],
+      ['⑥ t = ③ ÷ ⑤','<b>'+F2(r.t,4)+'</b>'],
+      ['⑦ df = n − 1',r.df],
+      ['⑧ 雙尾臨界值 t<sub>.975</sub>','±'+F2(S.qt(.975,r.df),4)],
+      ['⑨ p 值（雙尾）','<b>'+fpBare(r.p)+'</b>'],
+      ['⑩ Cohen\'s d = ③ ÷ ④',F2(r.d,3)]],[1])+'</table>',
+    [['判斷','|t| = '+F2(Math.abs(r.t),3)+(Math.abs(r.t)>S.qt(.975,r.df)?' 大於':' 小於')+'臨界值 '+
+      F2(S.qt(.975,r.df),3)+'，所以'+(r.p<.05?'拒絕':'無法拒絕')+' H₀。'],
+     ['兩條路同一個答案','比臨界值、或比 p 值與 .05，一定得到同樣的結論。臨界值法是電腦普及前的作法，p 值法是現在的慣例。'],
+     ['分子分母在幹嘛','分子 '+F2(m-mu,3)+' 是「效果」；分母 '+F2(r.se,3)+
+      ' 是「如果 H₀ 為真，平均數本來就會有的隨機浮動」。t 就是在問：這個效果是那個浮動的幾倍？']]);
+};
+HANDS.tind=()=>{
+  const a=MINI.G1,b=MINI.G2,n1=a.length,n2=b.length;
+  const m1=S.mean(a),m2=S.mean(b),v1=S.variance(a),v2=S.variance(b);
+  const sp2=((n1-1)*v1+(n2-1)*v2)/(n1+n2-2);
+  const r=S.tTestInd(a,b);
+  return handBox('手算：獨立樣本 t 檢定','甲組 '+a.join('、')+'　乙組 '+b.join('、'),
+    '<table>'+TH(['','甲組','乙組'],[1,2])+TR([
+      ['n',n1,n2],['M',F2(m1,3),F2(m2,3)],['s',F2(Math.sqrt(v1),3),F2(Math.sqrt(v2),3)],
+      ['s²（變異數）',F2(v1,4),F2(v2,4)],['SS = s²×(n−1)',F2(v1*(n1-1),3),F2(v2*(n2-1),3)]],[1,2])+'</table>'+
+    '<table style="margin-top:-1px">'+TR([
+      ['① 合併變異數 s²<sub>p</sub> = (SS₁+SS₂) ÷ (n₁+n₂−2)',F2(sp2,4)],
+      ['② 合併標準差 s<sub>p</sub> = √s²<sub>p</sub>',F2(Math.sqrt(sp2),4)],
+      ['③ 標準誤 SE = s<sub>p</sub>√(1/n₁ + 1/n₂)',F2(r.se,4)],
+      ['④ 平均差 M₁ − M₂','<b>'+F2(m1-m2,3)+'</b>'],
+      ['⑤ t = ④ ÷ ③','<b>'+F2(r.t,4)+'</b>'],
+      ['⑥ df = n₁ + n₂ − 2',r.df],
+      ['⑦ p（雙尾）','<b>'+fpBare(r.p)+'</b>'],
+      ['⑧ Cohen\'s d = ④ ÷ ②','<b>'+F2(r.d,3)+'</b>']],[1])+'</table>',
+    [['合併變異數在幹嘛','假設兩組母體變異數相同，那就該把兩組的資訊「合起來估一次」，而不是各估各的。權重是各自的 df，所以人多的組講話比較大聲。'],
+     ['檢查','s²<sub>p</sub> = '+F2(sp2,4)+' 一定落在 '+F2(Math.min(v1,v2),4)+' 與 '+F2(Math.max(v1,v2),4)+' 之間。算出來跑到範圍外就是算錯了。'],
+     ['d 的分母','Cohen\'s d 用的是 s<sub>p</sub>（合併標準差），不是 SE。用 SE 當分母會得到 t，那是完全不同的東西——這是初學最常犯的混淆。']]);
+};
+HANDS.tpair=()=>{
+  const p=MINI.PP, d=p.map(x=>x[0]-x[1]), n=d.length;
+  const r=S.tTestPaired(p.map(x=>x[0]),p.map(x=>x[1]));
+  const rows=p.map((x,i)=>[i+1,x[0],x[1],d[i],F2(d[i]-S.mean(d),2),F2(Math.pow(d[i]-S.mean(d),2),3)]);
+  rows.push(['<b>Σ</b>','','','<b>'+S.sum(d)+'</b>','<b>0.00</b>','<b>'+F2(S.sum(d.map(v=>Math.pow(v-S.mean(d),2))),3)+'</b>']);
+  return handBox('手算：成對樣本 t 檢定','5 個人的焦慮前測與後測',
+    '<table>'+TH(['#','前測','後測','D = 前−後','D − M<sub>D</sub>','(D − M<sub>D</sub>)²'],[0,1,2,3,4,5])+
+    TR(rows,[0,1,2,3,4,5])+'</table>'+
+    '<table style="margin-top:-1px">'+TR([
+      ['① M<sub>D</sub> = ΣD ÷ n','<b>'+F2(r.mean,3)+'</b>'],
+      ['② s<sub>D</sub> = √(Σ(D−M<sub>D</sub>)² ÷ (n−1))',F2(r.sdDiff,4)],
+      ['③ SE = s<sub>D</sub> ÷ √n',F2(r.se,4)],
+      ['④ t = ① ÷ ③','<b>'+F2(r.t,4)+'</b>'],
+      ['⑤ df = n − 1',r.df],
+      ['⑥ p（雙尾）','<b>'+fpBare(r.p)+'</b>'],
+      ['⑦ d<sub>z</sub> = ① ÷ ②','<b>'+F2(r.dz,3)+'</b>']],[1])+'</table>',
+    [['關鍵一步','把兩欄變成一欄 D，之後就完全是<b>單一樣本 t 檢定</b>（檢定 D 的平均是不是 0）。成對 t 沒有新公式。'],
+     ['為什麼比較敏感','前測分數從 49 到 62，個別差異很大；但 D 只有 '+d.join('、')+
+      '，變異小很多。個別差異被消掉了，分母就小，t 就大。'],
+     ['錯用獨立樣本會怎樣','同一份資料用獨立樣本 t 檢定會得到 t = '+
+      F2(S.tTestInd(p.map(x=>x[0]),p.map(x=>x[1])).t,3)+'，df = 8，p = '+
+      fpBare(S.tTestInd(p.map(x=>x[0]),p.map(x=>x[1])).p)+'——檢定力白白流失。']]);
+};
+HANDS.anova=()=>{
+  const g=MINI.G3, all=[].concat(...g), N=all.length, k=g.length, gm=S.mean(all);
+  const a=S.anova1(g);
+  const rows=g.map((x,i)=>[['甲','乙','丙'][i],x.join('、'),x.length,F2(S.mean(x),3),
+    F2(S.mean(x)-gm,3),F2(x.length*Math.pow(S.mean(x)-gm,2),3),
+    F2(S.sum(x.map(v=>Math.pow(v-S.mean(x),2))),3)]);
+  rows.push(['<b>總計</b>','','<b>'+N+'</b>','<b>'+F2(gm,3)+'</b>','','<b>'+F2(a.ssb,3)+'</b>','<b>'+F2(a.ssw,3)+'</b>']);
+  return handBox('手算：單因子變異數分析','三組各 4 人的記憶分數，總平均 = '+F2(gm,3),
+    '<table>'+TH(['組','分數','n','M<sub>組</sub>','M<sub>組</sub>−M<sub>總</sub>','n(M<sub>組</sub>−M<sub>總</sub>)²','Σ(X−M<sub>組</sub>)²'],[2,3,4,5,6])+
+    TR(rows,[2,3,4,5,6])+'</table>'+
+    '<table style="margin-top:-1px">'+TH(['變異來源','SS','df','MS','F','p'],[1,2,3,4,5])+
+    TR([['組間',F2(a.ssb,3),a.dfb,F2(a.msb,3),'<b>'+F2(a.F,3)+'</b>','<b>'+fpBare(a.p)+'</b>'],
+      ['組內（誤差）',F2(a.ssw,3),a.dfw,F2(a.msw,3),'',''],
+      ['總和',F2(a.sst,3),a.dfb+a.dfw,'','','']],[1,2,3,4,5])+'</table>',
+    [['第六欄','把每組平均離總平均的距離平方，再乘上該組人數——人多的組偏離越多，貢獻越大。加總就是 SS<sub>組間</sub>。'],
+     ['第七欄','每個人離「自己那組」平均的距離平方。加總就是 SS<sub>組內</sub>，也就是誤差。'],
+     ['檢查','SS<sub>組間</sub> + SS<sub>組內</sub> = '+F2(a.ssb,3)+' + '+F2(a.ssw,3)+' = '+F2(a.sst,3)+
+      '，應該剛好等於把全部 '+N+' 筆資料一起算的 Σ(X − M<sub>總</sub>)²。這是最好用的驗算。'],
+     ['df','組間 df = k − 1 = '+a.dfb+'；組內 df = N − k = '+a.dfw+'；兩者相加 = N − 1 = '+(N-1)+'。'],
+     ['η²','SS<sub>組間</sub> ÷ SS<sub>總</sub> = '+F2(a.eta2,4)+'，組別解釋了 '+F2(a.eta2*100,1)+'% 的變異。']]);
+};
+HANDS.chisq=()=>{
+  const o=MINI.CT, c=S.chi2Test(o);
+  const rows=[];
+  o.forEach((r,i)=>r.forEach((v,j)=>{
+    rows.push([['甲組','乙組'][i]+' × '+['通過','未通過'][j],v,F2(c.exp[i][j],2),
+      F2(v-c.exp[i][j],2),F2(Math.pow(v-c.exp[i][j],2)/c.exp[i][j],4)]);}));
+  rows.push(['<b>Σ</b>','<b>'+c.N+'</b>','<b>'+c.N+'</b>','<b>0.00</b>','<b>'+F2(c.x2,4)+'</b>']);
+  return handBox('手算：卡方獨立性檢定','2 × 2 表：甲組 12/8，乙組 5/15',
+    '<table>'+TH(['格子','觀察 O','期望 E','O − E','(O−E)²/E'],[1,2,3,4])+TR(rows,[1,2,3,4])+'</table>',
+    [['期望次數','E = 列總和 × 欄總和 ÷ 總人數。例如甲組通過的期望 = '+c.rowT[0]+' × '+c.colT[0]+' ÷ '+c.N+
+      ' = '+F2(c.exp[0][0],2)+'。意思是「如果組別和通過與否完全無關，這格應該有幾個人」。'],
+     ['O − E 的總和','一定是 0（期望次數的邊際總和與觀察值相同），所以必須平方才不會互相抵消——和變異數的邏輯一模一樣。'],
+     ['除以 E','同樣差 3 個人，在期望 5 的格子裡很嚴重，在期望 500 的格子裡微不足道。除以 E 就是在做這個標準化。'],
+     ['df','(列數−1)(欄數−1) = (2−1)(2−1) = '+c.df+'。2×2 表只有 1 個自由度：四格裡只要知道一格，其餘三格就被邊際總和鎖死了。'],
+     ['結果','χ²('+c.df+') = '+F2(c.x2,3)+', p '+fp(c.p)+"，Cramér's V = "+F2(c.v,3)+'。']]);
+};
+HANDS.r=()=>{
+  const d=MINI.XY, x=d.map(p=>p[0]), y=d.map(p=>p[1]);
+  const mx=S.mean(x),my=S.mean(y),sx=S.sd(x),sy=S.sd(y);
+  const rows=d.map((p,i)=>[p[0],p[1],F2((p[0]-mx)/sx,3),F2((p[1]-my)/sy,3),F2((p[0]-mx)/sx*((p[1]-my)/sy),4)]);
+  const zp=x.map((v,i)=>(v-mx)/sx*((y[i]-my)/sy));
+  rows.push(['<b>M</b>','<b>'+F2(my,2)+'</b>','','','<b>Σ = '+F2(S.sum(zp),4)+'</b>']);
+  rows[rows.length-1][0]='<b>'+F2(mx,2)+'</b>';
+  const r=S.pearson(x,y);
+  return handBox('手算：Pearson 相關係數','6 對「睡眠時數 / 記憶分數」',
+    '<table>'+TH(['X 睡眠','Y 記憶','z<sub>X</sub>','z<sub>Y</sub>','z<sub>X</sub> × z<sub>Y</sub>'],[0,1,2,3,4])+
+    TR(rows,[0,1,2,3,4])+'</table>',
+    [['公式','r = Σ(z<sub>X</sub> z<sub>Y</sub>) ÷ (n − 1) = '+F2(S.sum(zp),4)+' ÷ '+(x.length-1)+
+      ' = <b>'+F2(r.r,4)+'</b>'],
+     ['為什麼是乘積','兩個 z 同號（同時高於平均或同時低於平均）時乘積為正；一高一低時為負。把所有人的乘積加起來，就是在數「同進同退」壓過「一進一退」多少。'],
+     ['為什麼最大是 1','當 z<sub>X</sub> 恆等於 z<sub>Y</sub>（完全線性），Σz<sub>X</sub>z<sub>Y</sub> = Σz² = n − 1，除下去剛好是 1。r 不可能超過 1，超過就是算錯。'],
+     ['r²','r² = '+F2(r.r2,4)+'，這 6 對資料裡睡眠解釋了記憶 '+F2(r.r2*100,1)+'% 的變異。'],
+     ['t 檢定','t = r√((n−2)/(1−r²)) = '+F2(r.t,3)+'，df = '+r.df+'，p '+fp(r.p)+'。']]);
+};
+HANDS.reg=()=>{
+  const d=MINI.XY, x=d.map(p=>p[0]), y=d.map(p=>p[1]);
+  const mx=S.mean(x),my=S.mean(y);
+  const rows=d.map((p,i)=>[p[0],p[1],F2(p[0]-mx,3),F2(p[1]-my,3),
+    F2((p[0]-mx)*(p[1]-my),4),F2(Math.pow(p[0]-mx,2),4)]);
+  const sp=S.sum(x.map((v,i)=>(v-mx)*(y[i]-my))), sxx=S.sum(x.map(v=>Math.pow(v-mx,2)));
+  rows.push(['<b>M</b>','','','','<b>Σ = '+F2(sp,4)+'</b>','<b>Σ = '+F2(sxx,4)+'</b>']);
+  rows[rows.length-1][0]='<b>'+F2(mx,3)+'</b>'; rows[rows.length-1][1]='<b>'+F2(my,3)+'</b>';
+  const rg=S.regress(y,[x]);
+  const fit=d.map(p=>[p[0],p[1],F2(rg.beta[0]+rg.beta[1]*p[0],3),F2(p[1]-(rg.beta[0]+rg.beta[1]*p[0]),3),
+    F2(Math.pow(p[1]-(rg.beta[0]+rg.beta[1]*p[0]),2),4)]);
+  fit.push(['','','','<b>Σ ≈ 0</b>','<b>SS<sub>殘差</sub> = '+F2(rg.ssr,4)+'</b>']);
+  return handBox('手算：最小平方迴歸','同樣 6 對資料',
+    '<table>'+TH(['X','Y','X−M<sub>X</sub>','Y−M<sub>Y</sub>','乘積','(X−M<sub>X</sub>)²'],[0,1,2,3,4,5])+
+    TR(rows,[0,1,2,3,4,5])+'</table>'+
+    '<table style="margin-top:-1px">'+TR([
+      ['① SP = Σ(X−M<sub>X</sub>)(Y−M<sub>Y</sub>)',F2(sp,4)],
+      ['② SS<sub>X</sub> = Σ(X−M<sub>X</sub>)²',F2(sxx,4)],
+      ['③ 斜率 b = ① ÷ ②','<b>'+F2(rg.beta[1],4)+'</b>'],
+      ['④ 截距 a = M<sub>Y</sub> − b·M<sub>X</sub>','<b>'+F2(rg.beta[0],4)+'</b>'],
+      ['⑤ R²',F2(rg.r2,4)]],[1])+'</table>'+
+    '<table style="margin-top:-1px">'+TH(['X','實際 Y','預測 Ŷ','殘差 Y−Ŷ','殘差²'],[0,1,2,3,4])+
+    TR(fit,[0,1,2,3,4])+'</table>',
+    [['迴歸式','Ŷ = '+F2(rg.beta[0],3)+' + '+F2(rg.beta[1],3)+'X'],
+     ['為什麼是 SP/SS<sub>X</sub>','把 SSE = Σ(Y − a − bX)² 對 b 微分設為 0，解出來就是這個式子。下面的推導會一步步走一次。'],
+     ['殘差的兩個性質','① 殘差總和為 0；② 殘差與 X 的相關為 0。這兩件事是最小平方法的<b>數學必然</b>，不是資料的性質——所以它們不能拿來當「模型很好」的證據。'],
+     ['b 和 r 的關係','b = r × (s<sub>Y</sub> ÷ s<sub>X</sub>) = '+F2(S.pearson(x,y).r,4)+' × ('+
+      F2(S.sd(y),3)+' ÷ '+F2(S.sd(x),3)+') = '+F2(S.pearson(x,y).r*S.sd(y)/S.sd(x),4)+'，和 ③ 一致。']]);
+};
+HANDS.power=()=>{
+  const rows=[[.2,'小'],[.5,'中'],[.8,'大'],[1.0,''],[1.5,'']].map(([d,lab])=>{
+    let n=5;while(n<4000&&S.powerT2(d,n)<.8)n++;
+    return [F2(d,1)+(lab?'（'+lab+'）':''),n,2*n,F2(S.powerT2(d,20),3),F2(S.powerT2(d,50),3),F2(S.powerT2(d,100),3)];});
+  return handBox('查表：要多少人才夠','獨立樣本 t 檢定，α = .05 雙尾，目標檢定力 .80',
+    '<table>'+TH(['效果量 d','每組需要 n','總樣本數','n=20 的檢定力','n=50','n=100'],[1,2,3,4,5])+
+    TR(rows,[1,2,3,4,5])+'</table>',
+    [['最該記住的一行','d = 0.5 要<b>每組 64 人</b>。心理學大部分介入研究的真實效果就在 0.3–0.5 之間，所以 30 人一組的研究通常檢定力只有 .3–.5——連一半的機會都不到。'],
+     ['非線性','d 從 0.8 掉到 0.2，需要的人數從 26 暴增到 394，是 15 倍。效果越小，代價越是急遽上升。'],
+     ['怎麼用','寫研究計畫時：先從文獻找一個合理的 d（或想清楚「小到什麼程度我就不在乎了」），查這張表，那就是你的目標樣本數。倒過來做（收完資料再算檢定力）沒有意義。']]);
+};
+HANDS.eta=()=>{
+  const g=MINI.G3, a=S.anova1(g);
+  const t=S.tTestInd(MINI.G1,MINI.G2);
+  return handBox('手算：各種效果量怎麼互換','用上面兩組手算資料',
+    '<table>'+TH(['要換的東西','公式','代入','結果'],[3])+TR([
+      ["t → Cohen's d",'d = t√(1/n₁ + 1/n₂)',F2(t.t,3)+'×√(1/5+1/5)',F2(t.t*Math.sqrt(1/5+1/5),3)],
+      ['t → r','r = √(t²/(t²+df))','√('+F2(t.t*t.t,2)+'/('+F2(t.t*t.t,2)+'+8))',F2(Math.sqrt(t.t*t.t/(t.t*t.t+8)),3)],
+      ['F → η²','η² = SS<sub>組間</sub>/SS<sub>總</sub>',F2(a.ssb,2)+'/'+F2(a.sst,2),F2(a.eta2,3)],
+      ['F → ω²','ω² = (SS<sub>b</sub>−df<sub>b</sub>·MS<sub>w</sub>)/(SS<sub>總</sub>+MS<sub>w</sub>)','—',F2(a.omega2,3)],
+      ['r → d','d = 2r/√(1−r²)','—',F2(2*.5/Math.sqrt(1-.25),3)+'（以 r = .5 為例）'],
+      ['d → 重疊率','兩組分配重疊約','d = 0.8 時',F2((1-(2*S.pnorm(.8/2)-1))*100,0)+'%']],[3])+'</table>',
+    [['為什麼要會換','讀文獻時常常只給 t 或 F，沒給效果量。會換算才能把不同研究放在同一把尺上比較，這也是做後設分析的第一步。'],
+     ['η² vs ω²','η² 會高估母體效果（和 R² 一樣會被參數數量灌水）。ω² 是不偏版本，永遠比 η² 小一點；小樣本時差距明顯，這裡是 '+
+      F2(a.eta2,3)+' vs '+F2(a.omega2,3)+'。'],
+     ['d = 0.8 的真正意義','「大效果」聽起來很大，但兩組分配仍然重疊超過一半。統計上的大，跟生活中的「一看就知道不一樣」差很遠。']]);
+};
+HANDS.levene=()=>{
+  const g=[MINI.G1,MINI.G2];
+  const z=g.map(a=>{const md=S.median(a);return a.map(v=>Math.abs(v-md));});
+  const lv=S.levene(g);
+  const rows=g.map((a,i)=>[['甲組','乙組'][i],a.join('、'),F2(S.median(a),1),z[i].map(v=>F2(v,1)).join('、'),F2(S.mean(z[i]),3)]);
+  return handBox('手算：Levene 變異數同質檢定','它其實只是「對絕對離差做一次 ANOVA」',
+    '<table>'+TH(['組','原始分數','中位數','|X − 中位數|','平均'],[2,4])+TR(rows,[2,4])+'</table>'+
+    '<table style="margin-top:-1px">'+TR([['F',F2(lv.F,4)],['df₁, df₂',lv.df1+', '+lv.df2],
+      ['p','<b>'+fpBare(lv.p)+'</b>']],[1])+'</table>',
+    [['原理','如果兩組的散布程度一樣，那麼「每個人離自己組中心多遠」的平均也該一樣。把這些距離當成新的依變項跑 ANOVA，就是 Levene 檢定。'],
+     ['為什麼用中位數','原始的 Levene 用平均數，但對偏斜資料太敏感。改用中位數（Brown-Forsythe 版本）穩健得多，SPSS 與 JASP 現在都預設報這一版。'],
+     ['結論','p '+fp(lv.p)+(lv.p<.05?'，變異數不同質，改用 Welch。':'，沒有證據說兩組變異數不同，Student 與 Welch 都可以用。')],
+     ['別過度解讀','Levene 本身也是個檢定，一樣受樣本數影響：n 很大時一點點差異就顯著，n 很小時差很多也可能不顯著。這是「一律用 Welch」這個建議背後的理由。']]);
+};
+HANDS.inter=()=>{
+  const cells=[0,1,2].map(g=>[0,1].map(s=>DATA.filter(r=>r.group===g&&r.sex===s).map(r=>r.mem)));
+  const a=S.anova2(cells,3,2);
+  const cm=cells.map(r=>r.map(c=>S.mean(c)));
+  const rowM=cm.map(r=>S.mean(r)), colM=[0,1].map(j=>S.mean(cm.map(r=>r[j])));
+  const gm=S.mean([].concat(...cm));
+  const rows=cm.map((r,i)=>[GN[i],F2(r[0],2),F2(r[1],2),F2(rowM[i],2),F2(rowM[i]-gm,2)]);
+  rows.push(['<b>欄平均</b>','<b>'+F2(colM[0],2)+'</b>','<b>'+F2(colM[1],2)+'</b>','<b>'+F2(gm,2)+'</b>','']);
+  const res=cm.map((r,i)=>r.map((v,j)=>v-rowM[i]-colM[j]+gm));
+  return handBox('手算：交互作用到底在算什麼','每格 n = 10，用本課程資料的細格平均',
+    '<table>'+TH(['組別','女','男','列平均','列效果'],[1,2,3,4])+TR(rows,[1,2,3,4])+'</table>'+
+    '<table style="margin-top:-1px">'+TH(['組別','女的殘餘','男的殘餘','說明'],[1,2])+
+    TR(cm.map((r,i)=>[GN[i],F2(res[i][0],3),F2(res[i][1],3),
+      Math.abs(res[i][0])<.5?'接近 0，這一列沒有交互作用':'偏離 0，這一列就是交互作用的來源']),[1,2])+'</table>',
+    [['殘餘怎麼算','細格平均 − 列平均 − 欄平均 + 總平均。意思是「把兩個主要效果都扣掉之後，這一格還剩下多少沒被解釋」。'],
+     ['交互作用 SS','SS<sub>A×B</sub> = n × Σ(殘餘)² = 10 × '+F2(S.sum(res.flat().map(v=>v*v)),3)+' = '+
+      F2(a.AB.ss,2)+'，正好等於前面 ANOVA 表裡的交互作用 SS。'],
+     ['殘餘的性質','每一列的殘餘加起來是 0，每一欄也是 0。所以 3×2 設計只有 (3−1)(2−1) = 2 個自由度——這就是交互作用 df 的來源。'],
+     ['讀出結論','睡眠限制組的殘餘最大（女 '+F2(res[1][0],2)+'、男 '+F2(res[1][1],2)+
+      '），代表交互作用幾乎全部來自這一組：睡眠限制對男生特別傷。']]);
+};
+
+/* ===================== 幾何直覺圖 ===================== */
+const GEOMS={};
+function geomEl(k,cap){
+  const box=E('div','sim');
+  const hd=E('div','sim-head'); hd.appendChild(E('h4',null,GEOMS[k].title));
+  if(cap)hd.appendChild(E('span','hint',cap)); box.appendChild(hd);
+  const body=E('div','sim-body'); box.appendChild(body);
+  GEOMS[k].build(body);
+  return box;
+}
+GEOMS.varsq={title:'變異數就是「平均的正方形面積」',build(body){
+  let pts=[30,34,36,41,45], show=true;
+  const ch=canvasIn(body,.55,(ctx,w,h)=>{
+    const m=S.mean(pts);
+    const f=frame(ctx,w,h,{xd:[24,52],yd:[0,1],padB:28,padT:14,padL:16,padR:16,
+      xticks:[25,30,35,40,45,50],yticks:[]});
+    const C=f.C, base=h-70, unit=(f.X(30)-f.X(24))/6;
+    ctx.strokeStyle=C.rule2;ctx.beginPath();ctx.moveTo(f.X(24),base);ctx.lineTo(f.X(52),base);ctx.stroke();
+    ctx.strokeStyle=C.s1;ctx.lineWidth=2;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(f.X(m),f.padT);ctx.lineTo(f.X(m),base+8);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=C.s1;ctx.font='500 11px "IBM Plex Mono",monospace';ctx.textAlign='center';ctx.textBaseline='bottom';
+    ctx.fillText('M = '+F2(m,1),f.X(m),f.padT+1);
+    pts.forEach(v=>{
+      const d=v-m, side=Math.abs(d)*unit;
+      if(show&&side>1){
+        const x0=Math.min(f.X(v),f.X(m));
+        ctx.fillStyle=alpha(d>0?C.s2:C.s3,.2);
+        ctx.fillRect(x0,base-side,side,side);
+        ctx.strokeStyle=alpha(d>0?C.s2:C.s3,.75);ctx.lineWidth=1.2;
+        ctx.strokeRect(x0,base-side,side,side);
+        ctx.fillStyle=alpha(d>0?C.s2:C.s3,.95);ctx.font='10px "IBM Plex Mono",monospace';
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        if(side>22)ctx.fillText(F2(d*d,1),x0+side/2,base-side/2);
+      }
+      ctx.strokeStyle=C.ink2;ctx.lineWidth=1.4;
+      ctx.beginPath();ctx.moveTo(f.X(v),base-2);ctx.lineTo(f.X(v),base+2);ctx.stroke();
+      ctx.beginPath();ctx.arc(f.X(v),base,5.5,0,7);ctx.fillStyle=C.surface;ctx.fill();ctx.stroke();
+    });
+  });
+  let drag=-1;
+  const toV=e=>{const r=ch.c.getBoundingClientRect();
+    return 24+((e.clientX-r.left)/r.width*ch.w-16)/(ch.w-32)*28;};
+  ch.c.addEventListener('pointerdown',e=>{const v=toV(e);let bi=-1,bd=2.2;
+    pts.forEach((p,i)=>{if(Math.abs(p-v)<bd){bd=Math.abs(p-v);bi=i;}});
+    if(bi>=0){drag=bi;ch.c.setPointerCapture(e.pointerId);}});
+  ch.c.addEventListener('pointermove',e=>{if(drag<0)return;
+    pts[drag]=Math.max(25,Math.min(51,Math.round(toV(e))));redraw(ch);upd();});
+  ch.c.addEventListener('pointerup',()=>drag=-1);
+  ch.c.style.cursor='ew-resize';
+  const S1=stats(body,[['M'],['SS = Σ 面積'],['s² = SS/(n−1)','hi'],['s = √s²']]);
+  const upd=()=>{const m=S.mean(pts),ss=S.sum(pts.map(v=>(v-m)*(v-m)));
+    S1.M.textContent=F2(m,2);S1['SS = Σ 面積'].textContent=F2(ss,2);
+    S1['s² = SS/(n−1)'].textContent=F2(S.variance(pts),3);S1['s = √s²'].textContent=F2(S.sd(pts),3);};
+  upd();
+  body.appendChild(E('p','calc-note','每個點到平均數的距離，被畫成一個正方形。<b>變異數就是這些正方形的平均面積</b>（除以 n−1 而不是 n），標準差則是把那個平均面積開根號，變回一段長度。拖動任何一個點，看正方形怎麼長大——離得越遠，面積增加得越快（平方的代價）。'));
+  btnRow(body,[['顯示／隱藏正方形',function(){show=!show;redraw(ch);},true],
+    ['重設',()=>{pts=[30,34,36,41,45];redraw(ch);upd();},true],
+    ['製造一個極端值',()=>{pts=[30,34,36,41,51];redraw(ch);upd();},true]]);
+}};
+GEOMS.sspart={title:'一個人的分數，可以拆成三段',build(body){
+  const g=MINI.G3, all=[].concat(...g), gm=S.mean(all), a=S.anova1(g);
+  let pick=[0,0];
+  const ch=canvasIn(body,.5,(ctx,w,h)=>{
+    const f=frame(ctx,w,h,{xd:[-.5,2.5],yd:[24,50],padB:32,padT:14,padL:36,
+      xticks:[0,1,2],fxk:t=>['甲組','乙組','丙組'][t],yticks:[25,30,35,40,45,50],ylab:'分數'});
+    const C=f.C, cols=[C.s1,C.s2,C.s3];
+    ctx.strokeStyle=alpha(C.ink3,.8);ctx.lineWidth=1;ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(f.X(-.5),f.Y(gm));ctx.lineTo(f.X(2.5),f.Y(gm));ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=C.ink3;ctx.font='10px "IBM Plex Mono",monospace';ctx.textAlign='left';ctx.textBaseline='bottom';
+    ctx.fillText('總平均 '+F2(gm,2),f.X(-.45),f.Y(gm)-3);
+    g.forEach((grp,i)=>{
+      const gmean=S.mean(grp);
+      ctx.strokeStyle=cols[i];ctx.lineWidth=2.4;
+      ctx.beginPath();ctx.moveTo(f.X(i-.3),f.Y(gmean));ctx.lineTo(f.X(i+.3),f.Y(gmean));ctx.stroke();
+      grp.forEach((v,j)=>{
+        const x=f.X(i+(j-1.5)*.13), sel=(pick[0]===i&&pick[1]===j);
+        if(sel){
+          ctx.strokeStyle=alpha(C.s2,.9);ctx.lineWidth=5;
+          ctx.beginPath();ctx.moveTo(x,f.Y(gm));ctx.lineTo(x,f.Y(gmean));ctx.stroke();
+          ctx.strokeStyle=alpha(C.ink2,.75);ctx.lineWidth=5;
+          ctx.beginPath();ctx.moveTo(x,f.Y(gmean));ctx.lineTo(x,f.Y(v));ctx.stroke();
+        }
+        ctx.beginPath();ctx.arc(x,f.Y(v),sel?7:4.5,0,7);
+        ctx.fillStyle=sel?cols[i]:alpha(cols[i],.45);ctx.fill();
+        if(sel){ctx.strokeStyle=C.surface;ctx.lineWidth=2;ctx.stroke();}
+      });
+    });
+  });
+  ch.c.addEventListener('pointerdown',e=>{
+    const r=ch.c.getBoundingClientRect(), px=(e.clientX-r.left)/r.width*ch.w;
+    const i=Math.max(0,Math.min(2,Math.round(-.5+(px-36)/(ch.w-48)*3)));
+    const off=(px-36)/(ch.w-48)*3-.5-i;
+    const j=Math.max(0,Math.min(3,Math.round(off/.13+1.5)));
+    pick=[i,j];redraw(ch);upd();});
+  ch.c.style.cursor='pointer';
+  const S1=stats(body,[['這個人的分數'],['組平均'],['組間那段'],['組內那段'],['加起來']]);
+  const upd=()=>{const v=g[pick[0]][pick[1]], gmean=S.mean(g[pick[0]]);
+    S1['這個人的分數'].textContent=v;S1['組平均'].textContent=F2(gmean,2);
+    S1['組間那段'].textContent=F2(gmean-gm,2);S1['組內那段'].textContent=F2(v-gmean,2);
+    S1['加起來'].textContent=F2(v-gm,2);};
+  upd();
+  body.appendChild(E('p','calc-note','點任何一個資料點。<b>(X − 總平均) = (組平均 − 總平均) + (X − 組平均)</b>——橘色那段是「因為他在哪一組」，灰色那段是「因為他是他」。把所有人的兩段各自平方加總，就得到 SS<sub>組間</sub> 與 SS<sub>組內</sub>，而且兩者相加剛好等於 SS<sub>總</sub>（'+F2(a.ssb,2)+' + '+F2(a.ssw,2)+' = '+F2(a.sst,2)+'）。交叉項會完全消掉，這就是「變異可以被切開」的真正意思。'));
+}};
+GEOMS.zquad={title:'r 是「同進同退」減掉「一進一退」',build(body){
+  let r0=.7, pts=[];
+  const gen=r=>{const a=[];for(let i=0;i<30;i++){let z1=0,z2=0;
+    for(let q=0;q<12;q++){z1+=Math.random();z2+=Math.random();}
+    z1-=6;z2-=6;a.push([z1,r*z1+Math.sqrt(1-r*r)*z2]);}return a;};
+  pts=gen(r0);
+  const ch=canvasIn(body,.7,(ctx,w,h)=>{
+    const f=frame(ctx,w,h,{xd:[-3,3],yd:[-3,3],padB:28,padT:12,padL:34,
+      xticks:[-2,-1,0,1,2],yticks:[-2,-1,0,1,2],xlab:'z 分數（X）',ylab:'z 分數（Y）'});
+    const C=f.C;
+    ctx.fillStyle=alpha(C.s1,.07);
+    ctx.fillRect(f.X(0),f.Y(3),f.X(3)-f.X(0),f.Y(0)-f.Y(3));
+    ctx.fillRect(f.X(-3),f.Y(0),f.X(0)-f.X(-3),f.Y(-3)-f.Y(0));
+    ctx.fillStyle=alpha(C.s2,.07);
+    ctx.fillRect(f.X(-3),f.Y(3),f.X(0)-f.X(-3),f.Y(0)-f.Y(3));
+    ctx.fillRect(f.X(0),f.Y(0),f.X(3)-f.X(0),f.Y(-3)-f.Y(0));
+    ctx.strokeStyle=C.rule2;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(f.X(-3),f.Y(0));ctx.lineTo(f.X(3),f.Y(0));
+    ctx.moveTo(f.X(0),f.Y(-3));ctx.lineTo(f.X(0),f.Y(3));ctx.stroke();
+    ctx.font='10px "IBM Plex Sans",sans-serif';ctx.textBaseline='top';
+    ctx.fillStyle=alpha(C.s1,.9);ctx.textAlign='right';ctx.fillText('乘積為正 +',f.X(2.9),f.Y(2.9));
+    ctx.textAlign='left';ctx.fillText('乘積為正 +',f.X(-2.9),f.Y(-.15));
+    ctx.fillStyle=alpha(C.s2,.9);ctx.fillText('乘積為負 −',f.X(-2.9),f.Y(2.9));
+    ctx.textAlign='right';ctx.fillText('乘積為負 −',f.X(2.9),f.Y(-.15));
+    pts.forEach(p=>{ctx.beginPath();ctx.arc(f.X(p[0]),f.Y(p[1]),4,0,7);
+      ctx.fillStyle=alpha(p[0]*p[1]>0?C.s1:C.s2,.65);ctx.fill();});
+  });
+  const c=E('div','ctrls'); body.appendChild(c);
+  slider(c,'產生資料的 r',-.95,.95,.05,r0,v=>v.toFixed(2),v=>{r0=v;pts=gen(v);redraw(ch);upd();});
+  const S1=stats(body,[['實際 r','hi'],['正象限點數'],['負象限點數'],['Σ z·z ÷ (n−1)']]);
+  const upd=()=>{const x=pts.map(p=>p[0]),y=pts.map(p=>p[1]),r=S.pearson(x,y);
+    S1['實際 r'].textContent=F2(r.r,3);
+    S1['正象限點數'].textContent=pts.filter(p=>p[0]*p[1]>0).length;
+    S1['負象限點數'].textContent=pts.filter(p=>p[0]*p[1]<=0).length;
+    S1['Σ z·z ÷ (n−1)'].textContent=F2(S.sum(pts.map(p=>p[0]*p[1]))/(pts.length-1),3);};
+  upd();
+  body.appendChild(E('p','calc-note','每個點的 z<sub>X</sub> × z<sub>Y</sub>：落在藍色象限的乘積為正，橘色象限為負。r 就是<b>所有乘積的平均</b>（除以 n−1）。把滑桿拉到 0，你會看到四個象限的點數差不多，正負互相抵消；拉到 .9，點幾乎全擠在藍色對角線上。這也解釋了為什麼倒 U 型關係的 r 會接近 0——四個象限剛好平均分布。'));
+}};
+
+/* ===================== 迷你試算表 ===================== */
+function labEl(cfg,stageId){
+  const headers=cfg.headers, rows=cfg.rows;
+  const nCol=headers.length, nData=rows.length;
+  const nOpen=(cfg.open||[]).length;
+  const lblCol=nCol+nOpen+1, inCol=nCol+nOpen+2, totCol=nCol+nOpen+3;
+  const tasks=cfg.tasks.map((t,i)=>Object.assign({},t,{cell:FX.colName(inCol)+(2+i)}));
+  const nRow=Math.max(nData+1,tasks.length+2);
+
+  const open=(cfg.open||[]).map((o,i)=>Object.assign({},o,{c:nCol+i}));
+  const openCell={};
+  open.forEach(o=>{for(let r=2;r<=nData+1;r++)openCell[FX.colName(o.c)+r]=o;});
+
+  const book=FX.makeBook();
+  const ref=FX.makeBook();
+  const seed=bk=>{
+    headers.forEach((h,c)=>bk.set(c,0,h));
+    rows.forEach((r,i)=>r.forEach((v,c)=>bk.set(c,i+1,v)));
+    tasks.forEach((t,i)=>bk.set(lblCol,1+i,t.c));
+    open.forEach(o=>bk.set(o.c,0,o.label));
+  };
+  seed(book); seed(ref);
+  open.forEach(o=>{if(o.a)for(let r=2;r<=nData+1;r++)ref.setRef(FX.colName(o.c)+r,o.a.replace(/\{r\}/g,r));});
+  tasks.forEach(t=>ref.setRef(t.cell,t.a));
+  const expect=tasks.map(t=>ref.valueRef(t.cell));
+
+  /* 還原已存的作答 */
+  const store=(PROG.lab&&PROG.lab[stageId])||{};
+  Object.keys(store).forEach(k=>{if(/^[A-Z]+[0-9]+$/.test(k))book.setRef(k,store[k]);});
+
+  const box=E('div','lab');
+  const hd=E('div','lab-head');
+  hd.appendChild(E('h4',null,cfg.title));
+  hd.appendChild(E('span','hint',cfg.hint||'點右邊藍色的格子，輸入 Excel 公式'));
+  box.appendChild(hd);
+
+  const fbar=E('div','fbar');
+  const fref=E('div','fref','—'), fval=E('div','fval','選一個格子');
+  fbar.appendChild(fref); fbar.appendChild(fval); box.appendChild(fbar);
+
+  const wrap=E('div','sheet-wrap'); const tb=E('table','sheet');
+  const thead=E('thead'); const htr=E('tr'); htr.appendChild(E('th',null,''));
+  for(let c=0;c<totCol;c++)htr.appendChild(E('th',null,FX.colName(c)));
+  thead.appendChild(htr); tb.appendChild(thead);
+  const tbody=E('tbody');
+  const inputs={};
+  for(let r=0;r<nRow;r++){
+    const tr=E('tr'); tr.appendChild(E('th',null,String(r+1)));
+    for(let c=0;c<totCol;c++){
+      const td=E('td');
+      const ref0=FX.colName(c)+(r+1);
+      const isHdr=(r===0&&c<nCol), isData=(r>0&&r<=nData&&c<nCol), isLbl=(c===lblCol&&r>=1&&r<=tasks.length);
+      const isOpenHdr=(r===0)&&open.some(o=>o.c===c);
+      const task=tasks.find(t=>t.cell===ref0);
+      if(isOpenHdr){td.className='hdr';td.textContent=open.find(o=>o.c===c).label;}
+      else if(isHdr){td.className='hdr';td.textContent=headers[c];}
+      else if(isData){td.textContent=rows[r-1][c];}
+      else if(isLbl){td.className='lbl';td.textContent=tasks[r-1].c;}
+      else if(openCell[ref0]){
+        td.className='edit'; td.style.boxShadow='inset 0 0 0 1px var(--rule-2)';
+        td.style.background='var(--surface)';
+        const inp=document.createElement('input');
+        inp.type='text'; inp.id='lab'+stageId+'-'+ref0; inp.spellcheck=false;
+        inp.setAttribute('aria-label',ref0+' 輔助欄');
+        inp.value=fmtCell(book.valueRef(ref0));
+        inp.onfocus=()=>{inp.value=book.getRawRef(ref0)||'';selectCell(ref0);
+          try{inp.setSelectionRange(0,inp.value.length);}catch(e){}};
+        inp.onblur=()=>{commit(ref0,inp.value);inp.value=fmtCell(book.valueRef(ref0));};
+        inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();}
+          if(e.key==='Escape'){inp.value=book.getRawRef(ref0)||'';inp.blur();}};
+        inputs[ref0]=inp; td.appendChild(inp);
+      }
+      else if(task){
+        td.className='edit';
+        const inp=document.createElement('input');
+        inp.type='text'; inp.id='lab'+stageId+'-'+task.cell; inp.spellcheck=false;
+        inp.setAttribute('aria-label',task.c+' 的公式');
+        inp.value=fmtCell(book.valueRef(task.cell));
+        inp.dataset.cell=task.cell;
+        inp.onfocus=()=>{inp.value=book.getRawRef(task.cell)||'';selectCell(task.cell);
+          try{inp.setSelectionRange(0,inp.value.length);}catch(e){}};
+        inp.onblur=()=>{commit(task.cell,inp.value);inp.value=fmtCell(book.valueRef(task.cell));};
+        inp.onkeydown=e=>{
+          if(e.key==='Enter'){e.preventDefault();inp.blur();}
+          if(e.key==='Escape'){inp.value=book.getRawRef(task.cell)||'';inp.blur();}};
+        inp.oninput=()=>{fval.textContent=inp.value||'（空白）';};
+        inputs[task.cell]=inp; td.appendChild(inp);
+      }
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  tb.appendChild(tbody); wrap.appendChild(tb); box.appendChild(wrap);
+
+  function fmtCell(v){
+    if(v===''||v===null||v===undefined)return '';
+    if(FX.isErr(v))return v;
+    if(typeof v==='number'){
+      if(!isFinite(v))return '#NUM!';
+      const av=Math.abs(v);
+      if(av!==0&&(av<1e-4||av>=1e9))return v.toExponential(3);
+      return String(Math.round(v*1e6)/1e6);
+    }
+    return String(FX.disp(v));
+  }
+  function selectCell(cell){fref.textContent=cell;fval.textContent=book.getRawRef(cell)||'（空白）';}
+  function commit(cell,val){
+    book.setRef(cell,val);
+    if(!PROG.lab)PROG.lab={};
+    if(!PROG.lab[stageId])PROG.lab[stageId]={};
+    if(val)PROG.lab[stageId][cell]=val; else delete PROG.lab[stageId][cell];
+    save();
+    Object.keys(inputs).forEach(k=>{if(document.activeElement!==inputs[k])inputs[k].value=fmtCell(book.valueRef(k));});
+    fval.textContent=val||'（空白）';
+  }
+
+  /* 任務清單 */
+  const tl=E('div','tasks'); const cards=[];
+  tasks.forEach((t,i)=>{
+    const card=E('div','task');
+    card.appendChild(E('span','tc',t.cell));
+    const d=E('div','td',t.d); card.appendChild(d);
+    const act=E('div','ta');
+    const bChk=E('button','mini','檢查'); bChk.type='button'; bChk.onclick=()=>check(i,true);
+    const bAns=E('button','mini','解答'); bAns.type='button';
+    bAns.onclick=()=>{fillOpen();inputs[t.cell].value=t.a;commit(t.cell,t.a);
+      inputs[t.cell].value=fmtCell(book.valueRef(t.cell));check(i,true,true);};
+    act.appendChild(bChk); act.appendChild(bAns); card.appendChild(act);
+    const msg=E('div','msg','　'); msg.hidden=true; card.appendChild(msg);
+    cards.push({card,msg}); tl.appendChild(card);
+  });
+  box.appendChild(tl);
+
+  function fillOpen(){
+    open.forEach(o=>{if(!o.a)return;
+      for(let r=2;r<=nData+1;r++){
+        const rf=FX.colName(o.c)+r, f=o.a.replace(/\{r\}/g,r);
+        if(inputs[rf]){inputs[rf].value=f;commit(rf,f);inputs[rf].value=fmtCell(book.valueRef(rf));}
+      }});
+  }
+  function check(i,show,viaAnswer){
+    const t=tasks[i], raw=String(book.getRawRef(t.cell)||'').trim();
+    const {card,msg}=cards[i];
+    card.classList.remove('solved','miss');
+    const td=inputs[t.cell].parentElement; td.classList.remove('ok','bad');
+    let ok=false, text='', blank=false;
+    if(!raw){text='還沒作答。';blank=true;}
+    else if(raw[0]!=='='){text='Excel 的公式要以 <b>=</b> 開頭，例如 <code>=AVERAGE(A2:A9)</code>。直接填數字不算，這一關要練的是公式。';}
+    else{
+      const v=book.valueRef(t.cell);
+      const exp=expect[i];
+      const miss=(t.need||[]).filter(fn=>raw.toUpperCase().indexOf(fn.toUpperCase())<0);
+      if(FX.isErr(v))text='公式回傳 <b>'+v+'</b>。'+(v==='#NAME?'?'通常是函數名稱打錯，或這裡不支援這個函數。':
+        v==='#DIV/0!'?'除以 0 了，檢查一下範圍是不是選錯。':v==='#VALUE!'?'括號或逗號可能少了一個。':'');
+      else if(typeof exp==='number'){
+        if(typeof v!=='number')text='算出來不是數字，而是「'+String(v)+'」。';
+        else{
+          const tol=t.tol||Math.max(1e-6,Math.abs(exp)*1e-6);
+          if(Math.abs(v-exp)>tol)text='算出來是 <b>'+fmtCell(v)+'</b>，正確答案是 <b>'+fmtCell(exp)+'</b>。'+(t.hintWrong||'');
+          else if(miss.length)text='數字對了，但這一題要練的是 <b>'+miss.join('、')+'</b> 函數，換成它再試一次。';
+          else{ok=true;text=(viaAnswer?'這是解答：':'正確。')+(t.why||'');}
+        }
+      }
+      else{
+        if(String(v).trim()!==String(exp).trim())
+          text='你的結果是<br><code>'+String(v)+'</code><br>正確答案是<br><code>'+String(exp)+'</code>'+(t.hintWrong||'');
+        else if(miss.length)text='結果對了，但這一題要練的是 <b>'+miss.join('、')+'</b>，換成它再試一次。';
+        else{ok=true;text=(viaAnswer?'這是解答：':'正確。')+(t.why||'');}
+      }
+    }
+    msg.innerHTML=text; msg.hidden=false;
+    if(!blank){card.classList.add(ok?'solved':'miss'); td.classList.add(ok?'ok':'bad');}
+    return ok;
+  }
+
+  const foot=E('div','lab-foot');
+  const stat=E('div','foot-note','完成 0 / '+tasks.length);
+  const btns=E('div','foot-btns');
+  const bAll=E('button','btn','檢查全部'); bAll.type='button';
+  bAll.onclick=()=>{let n=0;tasks.forEach((t,i)=>{if(check(i,true))n++;});
+    stat.textContent='完成 '+n+' / '+tasks.length+(n===tasks.length?'　全部答對了':'');};
+  if(open.some(o=>o.a)){
+    const bFill=E('button','btn ghost','填入輔助欄公式'); bFill.type='button';
+    bFill.onclick=()=>{fillOpen();};
+    var extraFill=bFill;
+  }
+  const bClear=E('button','btn ghost','清空'); bClear.type='button';
+  bClear.onclick=()=>{Object.keys(inputs).forEach(k=>{inputs[k].value='';commit(k,'');});
+    cards.forEach(c=>{c.card.classList.remove('solved','miss');c.msg.hidden=true;});
+    Object.values(inputs).forEach(inp=>inp.parentElement.classList.remove('ok','bad'));
+    stat.textContent='完成 0 / '+tasks.length;};
+  btns.appendChild(bAll); if(typeof extraFill!=='undefined'&&extraFill)btns.appendChild(extraFill);
+  btns.appendChild(bClear);
+  foot.appendChild(stat); foot.appendChild(btns); box.appendChild(foot);
+
+  const fl=E('details','fn-list');
+  fl.appendChild(E('summary',null,'這個試算表支援哪些函數？（點開）'));
+  const inner=E('div',null,FX.FUNCS.filter(f=>f.indexOf('.')<0||f.indexOf('.')>0).sort()
+    .map(f=>'<code>'+f+'</code>').join(''));
+  inner.style.marginTop='.4rem';
+  fl.appendChild(inner);
+  fl.appendChild(E('p','calc-note','用法和真的 Excel 一樣：範圍寫成 <code>A2:A9</code>，可以巢狀、可以四則運算、可以引用別的格子。算出來的值會即時更新。'));
+  box.appendChild(fl);
+
+  /* 若已有存檔，載入後先跑一次檢查 */
+  if(Object.keys(store).length)setTimeout(()=>{let n=0;tasks.forEach((t,i)=>{
+    if(String(book.getRawRef(t.cell)||'').trim()&&check(i,true))n++;});
+    stat.textContent='完成 '+n+' / '+tasks.length;},0);
+  return box;
+}
+
+/* 產生資料列 */
+function labData(keys,n){
+  const rows=(n?DATA.slice(0,n):DATA).map(r=>keys.map(k=>r[k]));
+  return rows;
+}
+
+</script>
+<script>
+/* ===================== 加深內容：推導 · 手算 · 實作 ===================== */
+const SEC=label=>({t:'sec',label});
+const DERIVE=(title,steps)=>({t:'derive',title,steps});
+const HAND=k=>({t:'hand',k});
+const GEOM=(k,cap)=>({t:'geom',k,cap});
+const LAB=cfg=>Object.assign({t:'lab'},cfg);
+
+const SH_FULL={headers:['組別','性別','睡眠','手機','焦慮前','焦慮後','記憶'],
+  rows:DATA.map(r=>[r.group,r.sex,r.sleep,r.phone,r.pre,r.post,r.mem])};
+const SH_MINI8={headers:['記憶分數'],rows:MINI.A.map(v=>[v])};
+const SH_TWO={headers:['甲組','乙組'],rows:MINI.G1.map((v,i)=>[v,MINI.G2[i]])};
+const SH_XY={headers:['睡眠 X','記憶 Y'],rows:MINI.XY};
+const SH_PP={headers:['前測','後測'],rows:MINI.PP};
+const SH_G3={headers:['甲組','乙組','丙組'],rows:MINI.G3[0].map((_,i)=>[MINI.G3[0][i],MINI.G3[1][i],MINI.G3[2][i]])};
+const SH_20=(()=>{const g0=DATA.filter(r=>r.group===0),g1=DATA.filter(r=>r.group===1),g2=DATA.filter(r=>r.group===2);
+  return {headers:['控制組記憶','限制組記憶','衛教組記憶'],rows:g0.map((_,i)=>[g0[i].mem,g1[i].mem,g2[i].mem])};})();
+const SH_CT={headers:['組別','未達標','達標'],rows:[['控制組',8,12],['限制組',20,0],['衛教組',11,9]]};
+const SH_CELL={headers:['組別','女','男'],
+  rows:[0,1,2].map(g=>[['控制組','限制組','衛教組'][g]].concat([0,1].map(s=>
+    +S.mean(DATA.filter(r=>r.group===g&&r.sex===s).map(r=>r.mem)).toFixed(2))))};
+
+const EXTRA={};
+
+/* ================= 1 ================= */
+EXTRA[1]=[
+ SEC('深入'),
+ P('測量尺度聽起來像是一套分類法，但它其實有一個精確的數學定義：<b>一個尺度屬於哪一層，取決於你可以對它做哪些轉換而不破壞它所承載的資訊。</b>這個定義來自 Stevens（1946），而且它一次解釋了所有「這個能不能算平均數」的問題。'),
+ DERIVE('允許的轉換：測量尺度真正的定義',[
+  {m:'名義：<i>f</i> 是任何<b>一對一</b>的對應',
+   w:'把「控制組 = 0」改成「控制組 = 99」不會損失任何資訊，因為你只是換了標籤。但既然標籤是任意的，對標籤取平均當然沒有意義——把 0、1、2 平均成 1 只是在說「編碼的中點」，和組別無關。'},
+  {m:'次序：<i>f</i> 是任何<b>嚴格遞增</b>的函數',
+   w:'名次 1、2、3 換成 1、10、100 完全不影響「誰在前面」。既然任何遞增轉換都合法，而遞增轉換會改變間距，那麼「間距」就不是這個尺度承載的資訊——所以次序資料不該算平均數，只能算中位數與百分等級。'},
+  {m:'等距：<i>f</i>(<i>x</i>) = <i>ax</i> + <i>b</i>，<i>a</i> &gt; 0（仿射轉換）',
+   w:'攝氏換華氏就是 <i>F</i> = 1.8<i>C</i> + 32。這種轉換<b>保留差的比值</b>，卻不保留值本身的比值——這正是「可以加減、可以算平均數與標準差，但不能講倍數」的來源。'},
+  {m:'驗證一次：20℃ 是 10℃ 的兩倍熱嗎？',
+   w:'攝氏下 20 ÷ 10 = 2。換成華氏：68 ÷ 50 = 1.36。同一個物理事實，比值卻不一樣——所以那個「2 倍」是編碼的產物，不是溫度的性質。只要一個敘述會因為合法轉換而改變，它就不是這個尺度能支持的敘述。'},
+  {m:'再驗證：30℃ 與 20℃ 的差，是 20℃ 與 15℃ 的差的兩倍嗎？',
+   w:'攝氏：10 ÷ 5 = 2。華氏：(86−68) ÷ (68−59) = 18 ÷ 9 = 2。<b>差的比值被保留了。</b>所以等距尺度可以談「差距大小」，這就是為什麼平均數（本質上是差距的平衡點）和標準差在等距尺度上有意義。'},
+  {m:'比率：<i>f</i>(<i>x</i>) = <i>ax</i>，<i>a</i> &gt; 0（只能縮放，不能平移）',
+   w:'小時換成分鐘是 ×60，沒有 +b 這一項，因為 0 小時就是 0 分鐘——<b>零點不是約定的，是真的沒有</b>。這一項的消失，正是「可以講倍數」的全部理由。'}
+ ]),
+ NOTE('key','把這件事用一句話記住','<b>能不能做某個運算，看的是「這個敘述會不會因為合法的單位轉換而改變」。</b>會改變，那個敘述就不是資料的性質，只是編碼的性質。心理量表沒有真正的零點（焦慮 0 分不代表完全沒有焦慮），所以它是等距而非比率——這也是為什麼「他的焦慮是我的兩倍」在論文裡會被審查者圈起來。'),
+ SEC('動手做'),
+ P('下面是真正的試算表：左邊 A 到 G 欄是那 60 筆資料，右邊藍色的格子可以輸入 Excel 公式。打進去會<b>真的計算</b>——函數名稱打錯會回 <code>#NAME?</code>，範圍選錯會算出別的數字，和真的 Excel 一樣。'),
+ LAB({title:'動手做 1：用公式「問問題」',hint:'先熟悉 COUNT 家族，這是資料清理最常用的一組',
+  headers:SH_FULL.headers,rows:SH_FULL.rows,
+  tasks:[
+   {c:'總人數',d:'用 <code>COUNT</code> 數出 G 欄（記憶分數）有幾筆有效資料。<b>提示</b>：範圍是 <code>G2:G61</code>。',
+    a:'=COUNT(G2:G61)',need:['COUNT'],why:'COUNT 只數數值，會自動跳過空白與文字——所以它同時是「有幾筆有效資料」的檢查工具。'},
+   {c:'控制組人數',d:'用 <code>COUNTIF</code> 數出 A 欄裡編碼為 0（控制組）的有幾人。',
+    a:'=COUNTIF(A2:A61,0)',need:['COUNTIF'],why:'COUNTIF 的第二個參數是「條件」，可以是數值、也可以是像 ">=40" 這樣的字串。'},
+   {c:'限制組的女性人數',d:'用 <code>COUNTIFS</code>（注意有 S）同時下兩個條件：A 欄 = 1 <b>且</b> B 欄 = 0。',
+    a:'=COUNTIFS(A2:A61,1,B2:B61,0)',need:['COUNTIFS'],
+    hintWrong:'COUNTIFS 的參數是「範圍1, 條件1, 範圍2, 條件2」交錯排列。',
+    why:'這就是在做交叉表的其中一格。第 12 關的卡方檢定，整張列聯表都是這樣數出來的。'},
+   {c:'衛教組的平均記憶',d:'用 <code>AVERAGEIF</code> 算出 A 欄 = 2 那群人的 G 欄平均。',
+    a:'=AVERAGEIF(A2:A61,2,G2:G61)',need:['AVERAGEIF'],
+    why:'AVERAGEIF 的順序是「判斷範圍, 條件, 要平均的範圍」——很多人會把後兩個弄反。'},
+   {c:'達標人數（≥40）',d:'用 <code>COUNTIF</code> 加上文字條件 <code>"&gt;=40"</code>，數出記憶分數 40 分以上的人。',
+    a:'=COUNTIF(G2:G61,">=40")',need:['COUNTIF'],
+    hintWrong:'條件要用雙引號包起來，寫成 ">=40"。',
+    why:'把連續變項切成類別，是第 12 關卡方檢定的第一步。但要注意：切割點應該有理論依據，看了資料才決定切在哪裡是一種 p-hacking。'}
+  ]})
+];
+
+/* ================= 2 ================= */
+EXTRA[2]=[
+ SEC('幾何直覺'),
+ GEOM('varsq','拖動任何一個點'),
+ SEC('公式從哪裡來'),
+ P('「為什麼除以 <i>n</i> − 1？」這是統計課最常被問、也最少被回答的問題。答案不是慣例，是可以算出來的：<b>除以 n 會系統性地偏小，而且偏小的比例剛好是 (n−1)/n</b>。'),
+ DERIVE('為什麼分母是 n − 1（貝索校正）',[
+  {m:'目標：找一個 <i>c</i>，使得 E[ Σ(<i>X<sub>i</sub></i> − <i>M</i>)² ÷ <i>c</i> ] = <i>σ</i>²',
+   w:'「不偏」的意思是：長期重複抽樣，這個估計量的平均值剛好落在真值上。我們要解出那個讓它成立的分母 <i>c</i>。'},
+  {m:'Σ(<i>X<sub>i</sub></i> − <i>M</i>)² = Σ(<i>X<sub>i</sub></i> − <i>μ</i>)² − <i>n</i>(<i>M</i> − <i>μ</i>)²',
+   w:'這是一個代數恆等式：把 (X−M) 寫成 (X−μ) − (M−μ)，展開平方，交叉項 −2(M−μ)Σ(X−μ) 化簡成 −2n(M−μ)²，和最後一項合併就得到上式。<b>關鍵在於它是一個減法</b>：拿樣本平均數當中心，離差平方和一定比拿真平均數當中心來得小。'},
+  {m:'E[Σ(<i>X<sub>i</sub></i> − <i>μ</i>)²] = <i>nσ</i>²',
+   w:'每一項的期望值就是變異數的定義 E[(X−μ)²] = σ²，共 n 項。'},
+  {m:'E[(<i>M</i> − <i>μ</i>)²] = <i>σ</i>²/<i>n</i>',
+   w:'這是樣本平均數的變異數，也就是<b>標準誤的平方</b>——第 5 關會專門推它。先接受這一步。'},
+  {m:'E[Σ(<i>X<sub>i</sub></i> − <i>M</i>)²] = <i>nσ</i>² − <i>n</i>·(<i>σ</i>²/<i>n</i>) = (<i>n</i> − 1)<i>σ</i>²',
+   w:'把 3、4 代進 2。<b>離差平方和的期望值是 (n−1)σ²，不是 nσ²。</b>'},
+  {m:'所以 <i>c</i> = <i>n</i> − 1，<i>s</i>² = Σ(<i>X</i> − <i>M</i>)² ÷ (<i>n</i> − 1)',
+   w:'要讓期望值等於 σ²，分母就必須是 n − 1。這不是「修正一下比較保險」，是唯一能讓它不偏的數字。'},
+  {m:'偏誤有多大？除以 <i>n</i> 會低估 (<i>n</i>−1)/<i>n</i> 倍',
+   w:'n = 5 時只有真值的 80%，n = 30 時 96.7%，n = 200 時 99.5%。所以大樣本下兩者幾乎一樣——但小樣本下差很多，而心理學實驗常常就是小樣本。'},
+  {m:'另一種說法：自由度',
+   w:'知道 M 之後，n 個離差裡只有 n − 1 個可以自由變動（因為它們的總和一定是 0）。所以「有效的資訊量」是 n − 1 個，分母就用 n − 1。這兩種說法指向同一件事。'}
+ ]),
+ NOTE('warn','一個常見的誤解','<i>s</i>² 是 <i>σ</i>² 的不偏估計，但 <i>s</i>（開根號之後）<b>不是</b> <i>σ</i> 的不偏估計——因為期望值不能穿過平方根。<i>s</i> 其實會略微低估 <i>σ</i>。實務上沒有人在意這個偏誤（小樣本時約 2–3%），但知道這件事可以避免你把「不偏」當成萬能的性質。'),
+ SEC('一步一步手算'),
+ HAND('sd'),
+ HAND('quartile'),
+ SEC('動手做'),
+ P('這次資料只有 8 筆，而且 B、C 兩個<b>輔助欄是空的</b>——請你自己把它填出來。這正是 Excel 真實的用法：先用輔助欄把中間量算出來，再彙總。'),
+ LAB({title:'動手做 2：自己把標準差拆開算一次',hint:'B 欄與 C 欄要自己填；可以在 B2 打好公式後往下複製的概念，這裡請逐格輸入',
+  headers:SH_MINI8.headers,rows:SH_MINI8.rows,
+  open:[{label:'X − M',a:'=A{r}-AVERAGE($A$2:$A$9)'},{label:'(X − M)²',a:'=B{r}^2'}],
+  tasks:[
+   {c:'平均數 M',d:'用 <code>AVERAGE</code> 算 A 欄的平均數。',a:'=AVERAGE(A2:A9)',need:['AVERAGE']},
+   {c:'離差總和',d:'把 B 欄填好之後，用 <code>SUM</code> 加總 B 欄。<b>它應該是 0</b>——如果不是，就是 B 欄的公式錯了。',
+    a:'=SUM(B2:B9)',need:['SUM'],tol:1e-9,
+    hintWrong:'B 欄每一格要寫成 <code>=A2-AVERAGE($A$2:$A$9)</code>，注意平均數的範圍要用 $ 鎖住。',
+    why:'離差總和恆為 0，是平均數的定義性質，也是最好用的驗算。'},
+   {c:'離差平方和 SS',d:'用 <code>SUM</code> 加總 C 欄，得到 Σ(X − M)²。',a:'=SUM(C2:C9)',need:['SUM'],
+    why:'這個 SS 就是之後 ANOVA 表、迴歸表裡那個 SS。整個統計學都建立在它上面。'},
+   {c:'變異數 s²（自己除）',d:'把上面的 SS 除以 <b>n − 1</b>。不要用 VAR.S，請自己寫除法，例如 <code>=F4/7</code> 或 <code>=SUM(C2:C9)/(COUNT(A2:A9)-1)</code>。',
+    a:'=SUM(C2:C9)/(COUNT(A2:A9)-1)',
+    why:'自己除一次，「n − 1 從哪裡來」就不會再忘記。'},
+   {c:'用 VAR.S 對答案',d:'用 <code>VAR.S</code> 直接算，看看和你上一格的結果是否完全相同。',
+    a:'=VAR.S(A2:A9)',need:['VAR.S'],
+    why:'兩個數字一樣，代表你真的理解 VAR.S 在做什麼——而不只是會按按鈕。'},
+   {c:'標準差 s',d:'用 <code>STDEV.S</code> 算標準差，並且確認它等於變異數開根號。',
+    a:'=STDEV.S(A2:A9)',need:['STDEV.S']},
+   {c:'母體版本差多少',d:'用 <code>STDEV.P</code> 算一次，比較兩個數字。這一格請填 <code>STDEV.P</code> 的結果。',
+    a:'=STDEV.P(A2:A9)',need:['STDEV.P'],
+    why:'n = 8 時 STDEV.P 比 STDEV.S 小約 6.5%。做研究要估母體，永遠用 .S 版本。'}
+  ]})
+];
+
+/* ================= 3 ================= */
+EXTRA[3]=[
+ SEC('公式從哪裡來'),
+ P('盒鬚圖裡那個 <b>1.5</b> 常被當成魔法數字。它其實是 Tukey 刻意挑的，而且挑的理由可以算出來。'),
+ DERIVE('1.5 × IQR 這個 1.5 是怎麼來的',[
+  {m:'先問：常態分配下 IQR 有多寬？',
+   w:'標準常態的 Q1 = −0.6745，Q3 = +0.6745（因為 25% 與 75% 的分位數）。所以 IQR = 1.349<i>σ</i>。這個 1.349 是整段推導的起點。'},
+  {m:'鬍鬚的上界 = Q3 + 1.5 × IQR = 0.6745<i>σ</i> + 1.5 × 1.349<i>σ</i> = 2.698<i>σ</i>',
+   w:'換算成 z 分數，大約就是 ±2.7 個標準差。'},
+  {m:'常態下超過 ±2.698<i>σ</i> 的機率 ≈ 0.7%',
+   w:'也就是說：如果資料真的是常態的，<b>大約每 143 個人才會有 1 個被標成離群值</b>。這個比例夠低，所以被標出來的點值得你回頭看一眼；但也不至於低到永遠標不出東西。'},
+  {m:'如果改成 1.0 × IQR 呢？',
+   w:'上界會變成 2.02<i>σ</i>，常態下有 4.3% 會被標出來——n = 60 的資料會有 2–3 個「離群值」，但它們其實完全正常。太吵了。'},
+  {m:'如果改成 3.0 × IQR 呢？',
+   w:'上界變成 4.72<i>σ</i>，機率低於百萬分之三。幾乎永遠標不出東西。所以 SPSS 用 3 × IQR 來標「<b>極端值</b>」（星號），1.5 × IQR 標「離群值」（圓圈）——兩個門檻各有分工。'},
+  {m:'結論：1.5 是在「太吵」與「太鈍」之間的一個工程選擇',
+   w:'它不是統計定理，沒有 p 值，也不構成「可以刪除」的理由。它只是一個<b>提醒你去看一眼</b>的門檻。'}
+ ]),
+ NOTE('key','為什麼用 IQR 而不用標準差','要偵測離群值，卻用一個會被離群值本身嚴重扭曲的統計量（標準差）當尺，這叫掩蔽效應 (masking)：一個極端值會把 SD 撐大，結果它自己就不再「極端」了。IQR 只看中間 50% 的人，完全不受尾端影響——這種性質叫<b>穩健 (robust)</b>，是這條規則能成立的關鍵。'),
+ SEC('一步一步手算'),
+ HAND('quartile'),
+ SEC('動手做'),
+ LAB({title:'動手做 3：自己建一套離群值偵測',hint:'一路從 Q1 算到「有幾個人被標出來」',
+  headers:SH_FULL.headers,rows:SH_FULL.rows,
+  tasks:[
+   {c:'Q1',d:'用 <code>QUARTILE.INC</code> 算 D 欄（每日手機使用）的第一四分位數。第二個參數填 1。',
+    a:'=QUARTILE.INC(D2:D61,1)',need:['QUARTILE']},
+   {c:'Q3',d:'同樣用 <code>QUARTILE.INC</code>，第二個參數填 3。',a:'=QUARTILE.INC(D2:D61,3)',need:['QUARTILE']},
+   {c:'IQR',d:'Q3 減 Q1。可以直接引用上面兩格，例如 <code>=J3-J2</code>。',
+    a:'=QUARTILE.INC(D2:D61,3)-QUARTILE.INC(D2:D61,1)',
+    why:'引用別的格子是 Excel 最重要的習慣：中間量算一次就好，之後全部引用它，改一個地方全部跟著更新。'},
+   {c:'下界',d:'Q1 − 1.5 × IQR。',
+    a:'=QUARTILE.INC(D2:D61,1)-1.5*(QUARTILE.INC(D2:D61,3)-QUARTILE.INC(D2:D61,1))'},
+   {c:'上界',d:'Q3 + 1.5 × IQR。',
+    a:'=QUARTILE.INC(D2:D61,3)+1.5*(QUARTILE.INC(D2:D61,3)-QUARTILE.INC(D2:D61,1))'},
+   {c:'離群值個數',d:'用兩個 <code>COUNTIF</code> 相加：小於下界的人數 ＋ 大於上界的人數。<b>提示</b>：條件要把符號和格子接起來，寫成 <code>"&lt;"&amp;J5</code>。',
+    a:'=COUNTIF(D2:D61,"<"&(QUARTILE.INC(D2:D61,1)-1.5*(QUARTILE.INC(D2:D61,3)-QUARTILE.INC(D2:D61,1))))+COUNTIF(D2:D61,">"&(QUARTILE.INC(D2:D61,3)+1.5*(QUARTILE.INC(D2:D61,3)-QUARTILE.INC(D2:D61,1))))',
+    need:['COUNTIF'],
+    hintWrong:'如果你已經在 J5、J6 算好下界與上界，這一格可以寫成 <code>=COUNTIF(D2:D61,"&lt;"&amp;J5)+COUNTIF(D2:D61,"&gt;"&amp;J6)</code>。',
+    why:'手機使用時數是這份資料裡唯一有右偏傾向的變項，所以離群值會落在上端。這就是「先畫圖、再決定怎麼處理」的實際起點。'},
+   {c:'偏態',d:'用 <code>SKEW</code> 算 D 欄的偏態係數，確認方向和你剛才數到的離群值位置一致。',
+    a:'=SKEW(D2:D61)',need:['SKEW'],
+    why:'偏態為正 → 右尾長 → 離群值出現在上端。三件事互相印證，你的判讀才站得住。'}
+  ]})
+];
+
+/* ================= 4 ================= */
+EXTRA[4]=[
+ SEC('公式從哪裡來'),
+ DERIVE('z 分數的兩個性質，可以直接算出來',[
+  {m:'定義：<i>z<sub>i</sub></i> = (<i>X<sub>i</sub></i> − <i>M</i>) / <i>s</i>',
+   w:'注意 M 和 s 對整組資料而言是<b>常數</b>，只有 X 在變。這是接下來每一步的關鍵。'},
+  {m:'Σ<i>z<sub>i</sub></i> = (1/<i>s</i>) Σ(<i>X<sub>i</sub></i> − <i>M</i>) = (1/<i>s</i>) × 0 = 0',
+   w:'因為離差總和恆為 0（第 2 關手算過），所以 z 的總和是 0，平均數當然也是 0。'},
+  {m:'Σ<i>z<sub>i</sub></i>² = (1/<i>s</i>²) Σ(<i>X<sub>i</sub></i> − <i>M</i>)² = SS / <i>s</i>² = SS / (SS/(<i>n</i>−1)) = <i>n</i> − 1',
+   w:'把 s² 的定義代進去，SS 直接約掉。'},
+  {m:'所以 <i>s<sub>z</sub></i>² = Σ<i>z</i>² / (<i>n</i> − 1) = 1',
+   w:'z 分數的標準差<b>恆等於 1</b>，與原始資料的單位、尺度完全無關。這就是「共同語言」的數學基礎。'},
+  {m:'但是：形狀完全沒變',
+   w:'z 是 X 的線性函數（乘一個數、減一個數）。線性轉換只會平移與縮放，不會改變任何兩點的相對位置，所以偏態、峰度、分位數的相對位置都原封不動。<b>z 轉換不會把資料變常態。</b>'},
+  {m:'為什麼 ±1.96 是「95%」',
+   w:'標準常態下 P(−1.96 &lt; Z &lt; 1.96) = 0.95，兩側各留 2.5%。之後所有的 95% 信賴區間、α = .05 雙尾臨界值，都是從這一個數字長出來的。'}
+ ]),
+ NOTE('warn','z 分數 ≠ 常態分配','「把資料標準化」和「把資料常態化」是兩件完全不同的事，但初學者幾乎一定會混淆。標準化只動平均數和標準差；要改變形狀必須做<b>非線性</b>轉換（取對數、平方根、Box-Cox），而那會連帶改變所有的解讀方式。'),
+ SEC('一步一步手算'),
+ HAND('z'),
+ SEC('動手做'),
+ LAB({title:'動手做 4：把整欄轉成 z，再驗證它的性質',hint:'B 欄自己填，然後用 C、D 兩格驗證「平均 0、標準差 1」',
+  headers:SH_MINI8.headers,rows:SH_MINI8.rows,
+  open:[{label:'z 分數',a:'=(A{r}-AVERAGE($A$2:$A$9))/STDEV.S($A$2:$A$9)'}],
+  tasks:[
+   {c:'z 的平均數',d:'先把 B 欄填成 z 分數（也可以用 <code>STANDARDIZE</code>），再用 <code>AVERAGE</code> 算 B 欄的平均。<b>應該是 0</b>。',
+    a:'=AVERAGE(B2:B9)',need:['AVERAGE'],tol:1e-9,
+    hintWrong:'B2 應該是 <code>=STANDARDIZE(A2,AVERAGE($A$2:$A$9),STDEV.S($A$2:$A$9))</code>，範圍記得用 $ 鎖住。',
+    why:'算出來是 0（或 1E-16 這種捨入殘渣），代表你的 z 欄是對的。'},
+   {c:'z 的標準差',d:'用 <code>STDEV.S</code> 算 B 欄的標準差。<b>應該是 1</b>。',a:'=STDEV.S(B2:B9)',need:['STDEV.S']},
+   {c:'45 分的 z',d:'用 <code>STANDARDIZE</code> 算出「45 分」這個分數的 z 值。三個參數：值、平均數、標準差。',
+    a:'=STANDARDIZE(45,AVERAGE(A2:A9),STDEV.S(A2:A9))',need:['STANDARDIZE']},
+   {c:'45 分的百分等級',d:'把上一格的 z 丟進 <code>NORM.S.DIST</code>（第二個參數填 TRUE），得到常態下的累積機率。',
+    a:'=NORM.S.DIST(STANDARDIZE(45,AVERAGE(A2:A9),STDEV.S(A2:A9)),TRUE)',need:['NORM.S.DIST'],
+    why:'這一步用到了常態假設。z 分數本身不需要常態，但把 z 翻譯成百分比需要。'},
+   {c:'第 90 百分位的分數',d:'反過來：用 <code>NORM.INV</code>，機率填 0.9，平均數與標準差用 A 欄的。',
+    a:'=NORM.INV(0.9,AVERAGE(A2:A9),STDEV.S(A2:A9))',need:['NORM.INV'],
+    why:'NORM.DIST 是「給分數求機率」，NORM.INV 是「給機率求分數」。這一對函數之後會不斷出現（T.DIST／T.INV、F.DIST／F.INV）。'},
+   {c:'那個 1.96',d:'用 <code>NORM.S.INV</code> 算出左側累積機率 0.975 對應的 z 值。',
+    a:'=NORM.S.INV(0.975)',need:['NORM.S.INV'],
+    why:'1.959964。之後每一個 95% 信賴區間都是這個數字（或它的 t 版本）。'}
+  ]})
+];
+
+/* ================= 5 ================= */
+EXTRA[5]=[
+ SEC('公式從哪裡來'),
+ P('標準誤的公式 <i>SE</i> = <i>σ</i>/√<i>n</i> 大概是整門課最該親手推一次的東西。它只需要兩條變異數規則，而且那個 √ 就是從「平方」裡掉出來的。'),
+ DERIVE('SE = σ/√n 的推導',[
+  {m:'兩條規則：Var(<i>aX</i>) = <i>a</i>²Var(<i>X</i>)；若 <i>X</i>、<i>Y</i> 獨立，Var(<i>X</i>+<i>Y</i>) = Var(<i>X</i>) + Var(<i>Y</i>)',
+   w:'第一條說「乘以常數，變異數乘平方」——因為變異數本來就是平方的單位。第二條是獨立性的直接後果：獨立時共變數為 0，交叉項消失。<b>整段推導只用這兩條。</b>'},
+  {m:'樣本平均數 <i>M</i> = (1/<i>n</i>)(<i>X</i><sub>1</sub> + <i>X</i><sub>2</sub> + … + <i>X<sub>n</sub></i>)',
+   w:'把 M 看成「一堆隨機變數的線性組合」，而不是一個算好的數字。這個視角轉換是整個推論統計的入口。'},
+  {m:'Var(Σ<i>X<sub>i</sub></i>) = <i>n</i> · <i>σ</i>²',
+   w:'用第二條規則：n 個獨立的觀察值，每個變異數都是 σ²，加起來是 nσ²。<b>注意這裡是 n 倍，不是 n² 倍。</b>'},
+  {m:'Var(<i>M</i>) = Var( (1/<i>n</i>)Σ<i>X<sub>i</sub></i> ) = (1/<i>n</i>)² · <i>nσ</i>² = <i>σ</i>²/<i>n</i>',
+   w:'用第一條規則把 1/n 提出來會變成 1/n²，再乘上剛才的 nσ²，約掉一個 n。'},
+  {m:'SE = √Var(<i>M</i>) = <i>σ</i> / √<i>n</i>',
+   w:'開根號回到原單位。<b>那個 √n 就是「平方後約掉一個 n、再開回來」的產物</b>——不是誰硬塞進去的。'},
+  {m:'實務上 <i>σ</i> 未知，用 <i>s</i> 代替：SE ≈ <i>s</i>/√<i>n</i>',
+   w:'代價是：檢定統計量不再是常態，而是 <b>t 分配</b>，因為分母本身也是個會抖的估計值。這就是 t 分配存在的全部理由。'},
+  {m:'第 2 關欠的那一步，現在還了',
+   w:'貝索校正的推導裡用到 E[(M − μ)²] = σ²/n，正是這裡的 Var(M)。兩個推導扣在一起，n − 1 就完全說得通了。'},
+  {m:'獨立性一旦被違反會怎樣',
+   w:'如果觀察值正相關（同班同學、同一人重複測量），Var(ΣX) 會多出共變數項，實際變異比 nσ² <b>大</b>，但公式仍然除以 n——於是 SE 被低估、t 被高估、p 值太小。<b>這就是為什麼獨立性是最重要、也最無法補救的假設。</b>'}
+ ]),
+ SEC('一步一步手算'),
+ HAND('se'),
+ SEC('動手做'),
+ LAB({title:'動手做 5：標準誤與 √n 定律',hint:'用完整的 60 筆資料',
+  headers:SH_FULL.headers,rows:SH_FULL.rows,
+  tasks:[
+   {c:'記憶的 SD',d:'用 <code>STDEV.S</code> 算 G 欄的標準差。',a:'=STDEV.S(G2:G61)',need:['STDEV.S']},
+   {c:'√n',d:'用 <code>SQRT</code> 搭配 <code>COUNT</code>，算出 √n。',a:'=SQRT(COUNT(G2:G61))',need:['SQRT','COUNT']},
+   {c:'標準誤 SE',d:'SD 除以 √n。',a:'=STDEV.S(G2:G61)/SQRT(COUNT(G2:G61))',
+    why:'SD 約 6.7 分描述「人與人差多少」；SE 約 0.87 分描述「這個平均數有多不準」。兩者差了 √60 ≈ 7.75 倍。'},
+   {c:'如果只有 15 人',d:'同樣的 SD，但 n 改成 15，SE 會是多少？（把 COUNT 換成 15）',
+    a:'=STDEV.S(G2:G61)/SQRT(15)',
+    why:'n 從 60 掉到 15（÷4），SE 變成 2 倍。四分之一的人力，兩倍的不確定性。'},
+   {c:'要多精確就要多少人',d:'若想把 SE 壓到 0.5 分，需要多少人？<b>提示</b>：由 SE = SD/√n 解出 n = (SD/0.5)²。',
+    a:'=(STDEV.S(G2:G61)/0.5)^2',
+    why:'答案大約是 180 人。從 60 人加到 180 人（三倍成本），精確度只提升 1.73 倍——這就是 √n 定律的現實代價。'},
+   {c:'焦慮前測的 SE',d:'換一個變項練一次：算 E 欄的標準誤。',
+    a:'=STDEV.S(E2:E61)/SQRT(COUNT(E2:E61))',
+    why:'不同變項的 SE 不同，因為 SD 不同。報告誤差長條時務必說清楚畫的是 SD 還是 SE。'}
+  ]})
+];
+
+/* ================= 6 ================= */
+EXTRA[6]=[
+ SEC('公式從哪裡來'),
+ DERIVE('信賴區間是從抽樣分配「反轉」出來的',[
+  {m:'已知：(<i>M</i> − <i>μ</i>) / (<i>s</i>/√<i>n</i>) 服從 <i>t</i> 分配，df = <i>n</i> − 1',
+   w:'這是第 5 關的成果加上「σ 用 s 代替」的代價。整個信賴區間只從這一行長出來。'},
+  {m:'所以 P( −<i>t</i><sub>.975</sub> &lt; (<i>M</i> − <i>μ</i>)/SE &lt; <i>t</i><sub>.975</sub> ) = 0.95',
+   w:'這一行講的是<b>抽樣分配</b>：重複抽樣時，標準化後的統計量有 95% 的機會落在這兩個臨界值之間。此時 μ 是固定的，M 是會變的。'},
+  {m:'兩邊乘以 SE：−<i>t</i>·SE &lt; <i>M</i> − <i>μ</i> &lt; <i>t</i>·SE',
+   w:'純粹的代數移項，機率沒有變。'},
+  {m:'再移項：<i>M</i> − <i>t</i>·SE &lt; <i>μ</i> &lt; <i>M</i> + <i>t</i>·SE',
+   w:'這就是信賴區間的公式。<b>但要注意，移項並沒有讓 μ 變成隨機變數</b>——會動的仍然是 M，因此會動的是「區間」，不是 μ。'},
+  {m:'所以「95%」形容的是程序，不是這一個區間',
+   w:'一旦把資料代進去，M 變成一個具體的數字，區間也變成一段具體的範圍。此時它要嘛蓋到 μ、要嘛沒蓋到，機率是 1 或 0。95% 描述的是「這套做法長期的成功率」。'},
+  {m:'區間寬度 = 2 × <i>t</i> × <i>s</i>/√<i>n</i>',
+   w:'三個可以動的旋鈕：<b>信心水準</b>（改 t）、<b>測量精確度</b>（改 s，做法是改善工具或控制干擾）、<b>樣本數</b>（改 √n）。做研究時第二個旋鈕常常被忽略，但它往往比加人便宜得多。'},
+  {m:'和假設檢定的對偶關係',
+   w:'「95% CI 不包含 μ₀」⟺「雙尾檢定在 α = .05 下拒絕 H₀」。兩者是同一個不等式的兩種讀法，永遠不會給出矛盾的結論。所以報了 CI，其實就已經報了檢定結果——而且還多給了效果大小的範圍。'}
+ ]),
+ SEC('一步一步手算'),
+ HAND('se'),
+ SEC('動手做'),
+ LAB({title:'動手做 6：把信賴區間拆成三塊',hint:'先分別算出 SE 和臨界值，再組起來',
+  headers:SH_FULL.headers,rows:SH_FULL.rows,
+  tasks:[
+   {c:'平均睡眠 M',d:'C 欄的平均數。',a:'=AVERAGE(C2:C61)',need:['AVERAGE']},
+   {c:'SE',d:'C 欄的標準誤。',a:'=STDEV.S(C2:C61)/SQRT(COUNT(C2:C61))'},
+   {c:'臨界值 t',d:'用 <code>T.INV.2T</code>，機率填 0.05、自由度填 59。',a:'=T.INV.2T(0.05,59)',need:['T.INV.2T'],
+    why:'2.0010。比 1.96 大一點點，因為 σ 未知的代價。'},
+   {c:'誤差界限',d:'臨界值 × SE。',a:'=T.INV.2T(0.05,59)*STDEV.S(C2:C61)/SQRT(COUNT(C2:C61))'},
+   {c:'CI 下界',d:'平均數減掉誤差界限。',
+    a:'=AVERAGE(C2:C61)-T.INV.2T(0.05,59)*STDEV.S(C2:C61)/SQRT(COUNT(C2:C61))'},
+   {c:'CI 上界',d:'平均數加上誤差界限。',
+    a:'=AVERAGE(C2:C61)+T.INV.2T(0.05,59)*STDEV.S(C2:C61)/SQRT(COUNT(C2:C61))',
+    why:'區間是 [6.38, 6.97]，完全在 7 的左邊——所以我們有理由說這批學生睡眠不足。'},
+   {c:'用 CONFIDENCE.T 對答案',d:'用 <code>CONFIDENCE.T</code>（α, 標準差, n）直接算誤差界限，看看和你上面算的一不一樣。',
+    a:'=CONFIDENCE.T(0.05,STDEV.S(C2:C61),COUNT(C2:C61))',need:['CONFIDENCE.T'],
+    why:'一樣的話代表你懂了它在做什麼。注意不要用 CONFIDENCE.NORM，那個用的是 z。'},
+   {c:'99% 的誤差界限',d:'把 α 改成 0.01 再算一次誤差界限，比較它比 95% 版本寬多少。',
+    a:'=CONFIDENCE.T(0.01,STDEV.S(C2:C61),COUNT(C2:C61))',
+    why:'寬了約三分之一。想更有把握，就得接受更模糊的答案——沒有免費的午餐。'}
+  ]})
+];
+
+/* ================= 7 ================= */
+EXTRA[7]=[
+ SEC('公式從哪裡來'),
+ DERIVE('t 分配為什麼比常態胖',[
+  {m:'如果 <i>σ</i> 已知：(<i>M</i> − <i>μ</i>)/(<i>σ</i>/√<i>n</i>) 服從標準常態',
+   w:'分子會抖（因為 M 會抖），分母是個固定的數字。只有一個不確定的來源。'},
+  {m:'實務上 <i>σ</i> 未知，只好用 <i>s</i>：(<i>M</i> − <i>μ</i>)/(<i>s</i>/√<i>n</i>)',
+   w:'現在<b>分母也會抖了</b>。同一份母體，這次抽到的 s 可能偏小，下次可能偏大。'},
+  {m:'分母偏小的那幾次，整個比值會被放大',
+   w:'關鍵在於這是不對稱的：s 偏小會讓 t 暴衝（除以一個小數字），s 偏大只會讓 t 溫和地縮水。兩邊不對稱的結果，就是<b>極端值出現得比常態更頻繁</b>——也就是尾巴變厚。'},
+  {m:'所以臨界值必須更嚴格',
+   w:'df = 5 時雙尾 5% 的臨界值是 2.571，df = 30 時是 2.042，df = 60 時是 2.000，df → ∞ 時才收斂到 1.960。<b>樣本越小，你必須看到越誇張的結果才能宣稱顯著</b>——這正是小樣本應該付出的代價。'},
+  {m:'df 越大，s 越穩定，t 就越像常態',
+   w:'df = 30 以上兩者已經很接近，這就是「n ≥ 30 可以用常態近似」這條老規則的來源。但現在電腦直接算 t，沒有理由再用近似。'},
+  {m:'p 值的正式定義',
+   w:'<i>p</i> = P( |<i>T</i>| ≥ |<i>t</i><sub>觀察</sub>| | H<sub>0</sub> 為真 )。豎線右邊那個條件<b>不能省略</b>——省略它，就會變成「H₀ 為真的機率」這個經典誤解。'},
+  {m:'為什麼是「或更極端」',
+   w:'連續分配下，剛好等於某個值的機率是 0。所以只能問「落在這麼極端的區域」的機率，尾端面積因此必須包含所有更極端的情況。'}
+ ]),
+ NOTE('trap','α 的累積：一行算式','做 <i>k</i> 次獨立檢定，至少誤報一次的機率是 1 − (1 − α)<sup><i>k</i></sup>。α = .05 時：k = 3 → 14.3%；k = 10 → 40.1%；k = 20 → 64.2%；k = 50 → 92.3%。Bonferroni 的做法是把每次的判準降成 α/k，因為 1 − (1 − α/k)<sup>k</sup> ≈ α——這就是它為什麼有效，以及為什麼它偏保守。'),
+ SEC('一步一步手算'),
+ HAND('t1'),
+ SEC('動手做'),
+ LAB({title:'動手做 7：從頭做一次假設檢定',hint:'H₀：平均睡眠時數 = 7 小時',
+  headers:SH_FULL.headers,rows:SH_FULL.rows,
+  tasks:[
+   {c:'① M − μ₀',d:'C 欄的平均數減 7。',a:'=AVERAGE(C2:C61)-7'},
+   {c:'② SE',d:'C 欄的標準誤。',a:'=STDEV.S(C2:C61)/SQRT(COUNT(C2:C61))'},
+   {c:'③ t 值',d:'①÷②。可以直接引用上面兩格。',
+    a:'=(AVERAGE(C2:C61)-7)/(STDEV.S(C2:C61)/SQRT(COUNT(C2:C61)))',
+    why:'t = −2.204。負號代表樣本平均低於檢定值。'},
+   {c:'④ 雙尾 p',d:'用 <code>T.DIST.2T</code>，第一個參數要放 <b>t 的絕對值</b>（用 <code>ABS</code>），第二個放 df = 59。',
+    a:'=T.DIST.2T(ABS((AVERAGE(C2:C61)-7)/(STDEV.S(C2:C61)/SQRT(COUNT(C2:C61)))),59)',
+    need:['T.DIST.2T','ABS'],
+    hintWrong:'T.DIST.2T 不接受負數，一定要先包 ABS。',
+    why:'p = .031 < .05，拒絕 H₀。'},
+   {c:'⑤ 單尾 p',d:'用 <code>T.DIST.RT</code> 或把雙尾 p 除以 2，得到「平均數小於 7」這個方向的單尾 p。',
+    a:'=T.DIST.2T(ABS((AVERAGE(C2:C61)-7)/(STDEV.S(C2:C61)/SQRT(COUNT(C2:C61)))),59)/2',
+    why:'單尾 p 剛好是雙尾的一半（對稱分配）。看到雙尾 .08 才改成單尾報 .04，正是 p-hacking 的標準操作——所以方向必須事先決定。'},
+   {c:'⑥ 臨界值',d:'用 <code>T.INV.2T</code> 算 α = .05、df = 59 的雙尾臨界值。',a:'=T.INV.2T(0.05,59)',
+    why:'|t| = 2.204 > 2.001，和 p < .05 是同一個結論的兩種說法。'},
+   {c:'⑦ 自動下結論',d:'用 <code>IF</code>：如果雙尾 p 小於 0.05 就回 1，否則回 0。',
+    a:'=IF(T.DIST.2T(ABS((AVERAGE(C2:C61)-7)/(STDEV.S(C2:C61)/SQRT(COUNT(C2:C61)))),59)<0.05,1,0)',
+    need:['IF'],
+    why:'把判斷寫成公式，是為了讓「換一份資料就自動重算」——這才是試算表相對於手算的真正價值。'},
+   {c:'⑧ 做 20 次檢定至少錯一次的機率',d:'算 1 − 0.95<sup>20</sup>。',a:'=1-0.95^20',
+    why:'0.642。這就是多重比較校正存在的理由，算一次就再也忘不掉。'}
+  ]})
+];
+
+/* ================= 8 ================= */
+EXTRA[8]=[
+ SEC('公式從哪裡來'),
+ DERIVE('效果量、t 值與樣本數的三角關係',[
+  {m:'<i>t</i> = (<i>M</i><sub>1</sub> − <i>M</i><sub>2</sub>) / (<i>s<sub>p</sub></i>√(1/<i>n</i><sub>1</sub> + 1/<i>n</i><sub>2</sub>))',
+   w:'獨立樣本 t 的定義。分子是效果的<b>原始大小</b>，分母裡有兩樣東西：變異（s<sub>p</sub>）與樣本數。'},
+  {m:'<i>d</i> = (<i>M</i><sub>1</sub> − <i>M</i><sub>2</sub>) / <i>s<sub>p</sub></i>',
+   w:'Cohen\'s d 只把「除以 s<sub>p</sub>」留下來，<b>把樣本數從公式裡拿掉了</b>。這一行就是 d 和 t 的全部差別。'},
+  {m:'兩式相除：<i>t</i> = <i>d</i> / √(1/<i>n</i><sub>1</sub> + 1/<i>n</i><sub>2</sub>)　⟺　<i>d</i> = <i>t</i>√(1/<i>n</i><sub>1</sub> + 1/<i>n</i><sub>2</sub>)',
+   w:'兩組相等時簡化成 <i>t</i> = <i>d</i>√(<i>n</i>/2)。<b>這一行解釋了一切</b>：效果量固定時，t 隨 √n 成長，所以樣本夠大時，任何非零的效果最後都會顯著。'},
+  {m:'代個數字：<i>d</i> = 0.1（幾乎沒有差別）',
+   w:'每組 30 人 → t = 0.39，p = .70；每組 500 人 → t = 1.58，p = .11；每組 2000 人 → t = 3.16，<b>p = .002</b>。同樣微不足道的效果，只要人夠多就會「高度顯著」。'},
+  {m:'反過來：<i>p</i> 值不能當效果量，但 <i>t</i> 可以還原成 <i>d</i>',
+   w:'讀論文時若只給 t 和 n，用上面的式子就能還原 d，把不同研究放在同一把尺上比。這是後設分析的第一步。'},
+  {m:'檢定力：把顯著的門檻換算成效果的門檻',
+   w:'要顯著，必須 |t| &gt; t<sub>crit</sub> ≈ 2，也就是 <i>d</i>√(<i>n</i>/2) &gt; 2，即 <b><i>d</i> &gt; 2√(2/<i>n</i>)</b>。每組 25 人時，這個門檻是 d = 0.57——換句話說，這個研究<b>只能偵測到 0.57 以上的效果</b>，小於這個就幾乎不可能顯著，不管它是不是真的。'},
+  {m:'Winner\'s curse 的算式來源',
+   w:'承上：檢定力低的研究，只有「運氣好、樣本 d 被抽得特別大」的那幾次才會顯著。於是<b>已發表的顯著結果，其效果量的期望值必然高於真值</b>。這不是研究者作弊，是選擇性發表加上低檢定力的數學必然。'},
+  {m:'所需樣本數的近似公式',
+   w:'要達到檢定力 .80、α = .05 雙尾，每組需要 <i>n</i> ≈ 16/<i>d</i>²。d = 0.5 → 64；d = 0.8 → 25；d = 0.2 → 400。這個近似式誤差在 5% 以內，值得背下來。'}
+ ]),
+ SEC('查表與換算'),
+ HAND('power'),
+ HAND('eta'),
+ SEC('動手做'),
+ LAB({title:'動手做 8：算效果量，並且反推樣本數',hint:'兩組各 20 人的真實資料',
+  headers:SH_20.headers,rows:SH_20.rows,
+  tasks:[
+   {c:'M₁ − M₂',d:'控制組平均減限制組平均。',a:'=AVERAGE(A2:A21)-AVERAGE(B2:B21)'},
+   {c:'合併變異數 s²ₚ',d:'((n₁−1)s₁² + (n₂−1)s₂²) ÷ (n₁+n₂−2)。這裡 n₁ = n₂ = 20。',
+    a:'=(19*VAR.S(A2:A21)+19*VAR.S(B2:B21))/38',
+    why:'權重是各自的自由度。人數相等時它剛好等於兩個變異數的平均。'},
+   {c:"Cohen's d",d:'平均差 ÷ 合併標準差（上一格開根號）。',
+    a:'=(AVERAGE(A2:A21)-AVERAGE(B2:B21))/SQRT((19*VAR.S(A2:A21)+19*VAR.S(B2:B21))/38)',
+    why:'d = 1.50，遠超過 0.8 的「大效果」門檻。'},
+   {c:'t 值',d:'用 <code>T.TEST</code> 之外的方式：平均差 ÷ (sₚ × √(1/20+1/20))。',
+    a:'=(AVERAGE(A2:A21)-AVERAGE(B2:B21))/(SQRT((19*VAR.S(A2:A21)+19*VAR.S(B2:B21))/38)*SQRT(1/20+1/20))'},
+   {c:'用 d 反推 t',d:'驗證上面的關係式：<code>d*SQRT(20/2)</code> 應該等於剛才的 t。',
+    a:'=((AVERAGE(A2:A21)-AVERAGE(B2:B21))/SQRT((19*VAR.S(A2:A21)+19*VAR.S(B2:B21))/38))*SQRT(20/2)',
+    why:'兩個數字一樣，代表 t = d√(n/2) 這條關係你已經握在手上了。'},
+   {c:'這個 n 能偵測多小的效果',d:'算 2×√(2/20)，也就是每組 20 人時「剛好會顯著」的最小 d。',
+    a:'=2*SQRT(2/20)',
+    why:'0.63。低於這個效果量的差異，這個樣本數幾乎抓不到——所以「不顯著」在小樣本裡幾乎沒有資訊。'},
+   {c:'d = 0.5 要幾人',d:'用近似公式 16/d²，算 d = 0.5 時每組需要多少人。',a:'=16/0.5^2',
+    why:'64 人／組。和精確計算的 64 完全吻合。'},
+   {c:'d = 0.2 要幾人',d:'同一個公式，d 換成 0.2。',a:'=16/0.2^2',
+    why:'400 人／組，總共 800 人。這就是為什麼「小效果」在心理學裡很難被穩定複製。'}
+  ]})
+];
+
+</script>
+<script>
+/* ================= 9 ================= */
+EXTRA[9]=[
+ SEC('公式從哪裡來'),
+ DERIVE('合併變異數與 Welch 自由度',[
+  {m:'問題：兩組各有自己的 <i>s</i>²，該用哪一個當分母？',
+   w:'如果假設兩個母體的變異數相同（σ₁² = σ₂²），那麼兩組資料都在估同一個東西，就不該各估各的——應該把資訊合起來，得到一個更準的估計。'},
+  {m:'加權平均：<i>s<sub>p</sub></i>² = [(<i>n</i><sub>1</sub>−1)<i>s</i><sub>1</sub>² + (<i>n</i><sub>2</sub>−1)<i>s</i><sub>2</sub>²] ÷ (<i>n</i><sub>1</sub>+<i>n</i><sub>2</sub>−2)',
+   w:'權重是<b>自由度</b>而不是人數。理由和第 2 關一樣：每組貢獻的獨立資訊量是 n−1 個，不是 n 個。分母就是兩組自由度的總和。'},
+  {m:'換個寫法：<i>s<sub>p</sub></i>² = (SS<sub>1</sub> + SS<sub>2</sub>) ÷ (df<sub>1</sub> + df<sub>2</sub>)',
+   w:'因為 SS = s²×(n−1)。這個寫法更能看出它在做什麼：<b>把兩堆離差平方和倒在一起，除以總自由度</b>。第 10 關的 MS<sub>組內</sub> 就是同一件事推廣到 k 組。'},
+  {m:'標準誤：SE = <i>s<sub>p</sub></i>√(1/<i>n</i><sub>1</sub> + 1/<i>n</i><sub>2</sub>)',
+   w:'由 Var(M₁ − M₂) = Var(M₁) + Var(M₂) = σ²/n₁ + σ²/n₂ 得來——又是第 5 關那兩條變異數規則。獨立性在這裡再次被用到。'},
+  {m:'如果變異數其實不相等呢？',
+   w:'合併就變成一件壞事：你把兩個不同的東西平均成一個，結果兩邊都不對。人數不等時尤其糟——人多的那組主導了 s<sub>p</sub>，但它的變異可能剛好是小的那個。'},
+  {m:'Welch 的做法：不合併，直接用 SE = √(<i>s</i><sub>1</sub>²/<i>n</i><sub>1</sub> + <i>s</i><sub>2</sub>²/<i>n</i><sub>2</sub>)',
+   w:'各用各的變異數。代價是這個統計量不再精確服從 t 分配，只能近似。'},
+  {m:'Welch–Satterthwaite 自由度',
+   w:'df = (<i>s</i><sub>1</sub>²/<i>n</i><sub>1</sub> + <i>s</i><sub>2</sub>²/<i>n</i><sub>2</sub>)² ÷ [ (<i>s</i><sub>1</sub>²/<i>n</i><sub>1</sub>)²/(<i>n</i><sub>1</sub>−1) + (<i>s</i><sub>2</sub>²/<i>n</i><sub>2</sub>)²/(<i>n</i><sub>2</sub>−1) ]。這個式子是「找一個 t 分配，讓它的前兩階動差和真實分配對上」的結果，所以算出來通常<b>不是整數</b>——SPSS 輸出裡 df = 57.83 就是這麼來的，不是誰打錯字。'},
+  {m:'為什麼建議一律用 Welch',
+   w:'變異數真的相等時，Welch 的自由度會自動趨近 n₁+n₂−2，兩者幾乎沒有差別（損失不到 1% 的檢定力）；不相等時 Welch 才是對的。既然一邊幾乎沒損失、另一邊能救命，就沒有理由先跑 Levene 再決定——那還多做了一次檢定，反而把型一錯誤弄複雜。'}
+ ]),
+ SEC('一步一步手算'),
+ HAND('tind'),
+ HAND('tpair'),
+ SEC('動手做'),
+ P('這份完整資料是照組別排序的：<b>第 2–21 列是控制組，22–41 列是睡眠限制組，42–61 列是睡眠衛教組</b>。所以要取某一組，直接用列號範圍就好。'),
+ LAB({title:'動手做 9：三種 t 檢定各做一次',hint:'G 欄是記憶分數，C 欄是睡眠，E/F 欄是焦慮前後測',
+  headers:SH_FULL.headers,rows:SH_FULL.rows,
+  tasks:[
+   {c:'① 單一樣本 t',d:'檢定 C 欄（睡眠）的平均是否等於 7：(M − 7) ÷ SE。',
+    a:'=(AVERAGE(C2:C61)-7)/(STDEV.S(C2:C61)/SQRT(60))'},
+   {c:'② 獨立樣本 p（等變異）',d:'用 <code>T.TEST</code> 比較控制組（G2:G21）與限制組（G22:G41）。尾數填 2、類型填 <b>2</b>。',
+    a:'=T.TEST(G2:G21,G22:G41,2,2)',need:['T.TEST'],
+    why:'p 遠小於 .001。T.TEST 只給 p，不給 t 與 df——這就是它在寫論文時不夠用的地方。'},
+   {c:'③ 獨立樣本 p（Welch）',d:'同樣的兩組，類型改成 <b>3</b>。比較 ② 和 ③ 的差別。',
+    a:'=T.TEST(G2:G21,G22:G41,2,3)',need:['T.TEST'],
+    why:'兩組變異數接近時，Student 與 Welch 的 p 幾乎一樣。差很多的時候，代表你本來就該用 Welch。'},
+   {c:'④ 自己算 t',d:'不要用 T.TEST：平均差 ÷ (sₚ × √(1/20+1/20))。sₚ² = (19s₁²+19s₂²)/38。',
+    a:'=(AVERAGE(G2:G21)-AVERAGE(G22:G41))/(SQRT((19*VAR.S(G2:G21)+19*VAR.S(G22:G41))/38)*SQRT(1/20+1/20))',
+    why:'t = 4.75。算得出這個數字，代表你真的知道 T.TEST 背後在做什麼。'},
+   {c:'⑤ 由 t 反推 p',d:'把 ④ 的 t 丟進 <code>T.DIST.2T</code>，df = 38。應該和 ② 完全一樣。',
+    a:'=T.DIST.2T(ABS((AVERAGE(G2:G21)-AVERAGE(G22:G41))/(SQRT((19*VAR.S(G2:G21)+19*VAR.S(G22:G41))/38)*SQRT(1/20+1/20))),38)',
+    need:['T.DIST.2T'],
+    why:'兩條路殊途同歸。自己走一次，T.TEST 就不再是黑盒子。'},
+   {c:'⑥ 成對樣本 p',d:'用 <code>T.TEST</code> 比較 E 欄與 F 欄（全體 60 人的前後測），類型填 <b>1</b>。',
+    a:'=T.TEST(E2:E61,F2:F61,2,1)',need:['T.TEST'],
+    why:'p = .038，剛好擦邊顯著。但這個「整體下降」其實是三組互相抵消後的殘影：限制組的焦慮上升、衛教組下降。把它當成「介入有效」就完全誤讀了資料。'},
+   {c:'⑦ 只看衛教組的成對 p',d:'同樣類型 1，但範圍改成第 42–61 列。',
+    a:'=T.TEST(E42:E61,F42:F61,2,1)',need:['T.TEST'],
+    why:'p = .0002。只看衛教組，效果比整體強了兩個數量級——分組之後才看得到真正發生了什麼。'},
+   {c:'⑧ 誤用獨立樣本會怎樣',d:'把 ⑦ 的類型改成 2（獨立樣本），看看 p 變成多少。',
+    a:'=T.TEST(E42:E61,F42:F61,2,2)',need:['T.TEST'],
+    why:'p 從 .0002 掉到 .065——用錯檢定，一個結實的效果就變成不顯著了。配對設計的威力全在這個對比裡。'}
+  ]})
+];
+
+/* ================= 10 ================= */
+EXTRA[10]=[
+ SEC('幾何直覺'),
+ GEOM('sspart','點任何一個資料點'),
+ SEC('公式從哪裡來'),
+ DERIVE('SS 為什麼可以乾淨地切成兩半',[
+  {m:'對每一個人：(<i>X<sub>ij</sub></i> − <i>M</i><sub>總</sub>) = (<i>M<sub>j</sub></i> − <i>M</i><sub>總</sub>) + (<i>X<sub>ij</sub></i> − <i>M<sub>j</sub></i>)',
+   w:'加一個、減一個 M<sub>j</sub>，恆等式。左邊是「這個人離全體多遠」，右邊拆成「他那組離全體多遠」＋「他離自己組多遠」。'},
+  {m:'兩邊平方後加總：Σ(<i>X</i>−<i>M</i><sub>總</sub>)² = Σ(<i>M<sub>j</sub></i>−<i>M</i><sub>總</sub>)² + Σ(<i>X</i>−<i>M<sub>j</sub></i>)² + <b>2Σ(<i>M<sub>j</sub></i>−<i>M</i><sub>總</sub>)(<i>X</i>−<i>M<sub>j</sub></i>)</b>',
+   w:'展開 (a+b)² = a² + b² + 2ab。關鍵全在最後那個交叉項。'},
+  {m:'交叉項在每一組內先加：(<i>M<sub>j</sub></i>−<i>M</i><sub>總</sub>) 對該組是常數，可以提出來',
+   w:'2(<i>M<sub>j</sub></i>−<i>M</i><sub>總</sub>) × Σ<sub>i</sub>(<i>X<sub>ij</sub></i>−<i>M<sub>j</sub></i>)'},
+  {m:'而 Σ<sub>i</sub>(<i>X<sub>ij</sub></i> − <i>M<sub>j</sub></i>) = 0',
+   w:'又是「離差總和為 0」——這條性質在這門課裡第四次派上用場。所以<b>交叉項整個消失</b>。'},
+  {m:'SS<sub>總</sub> = SS<sub>組間</sub> + SS<sub>組內</sub>',
+   w:'變異可以被「切開」不是比喻，是一個代數恆等式。這也是為什麼算完 ANOVA 表一定要驗算這一行——對不起來就是哪裡算錯了。'},
+  {m:'為什麼要除以 df 變成 MS',
+   w:'SS 會隨資料量增加而變大，不能直接比。除以各自的自由度之後，MS<sub>組內</sub> 是 σ² 的不偏估計；而<b>當 H₀ 為真時</b>，MS<sub>組間</sub> 也是 σ² 的不偏估計。'},
+  {m:'所以 <i>F</i> = MS<sub>組間</sub> / MS<sub>組內</sub> 在 H₀ 下應該接近 1',
+   w:'兩個都在估同一個 σ²，比值自然接近 1。H₀ 為假時，組間多了「真實差異」這一項，分子被撐大，F 就變大。<b>F 只看右尾</b>，因為 F 太小不代表有效果，只代表組平均異常地接近。'},
+  {m:'k = 2 時 <i>F</i> = <i>t</i>²',
+   w:'兩組的變異數分析和獨立樣本 t 檢定是同一個檢定的兩種寫法，p 值完全相同。可以自己驗證：t = 4.75 → t² = 22.6 = F。'}
+ ]),
+ SEC('一步一步手算'),
+ HAND('anova'),
+ SEC('動手做'),
+ LAB({title:'動手做 10：親手把整張 ANOVA 表建出來',hint:'三欄各 20 人，從 SS 一路算到 p 與 η²',
+  headers:SH_20.headers,rows:SH_20.rows,
+  tasks:[
+   {c:'總平均',d:'三欄全部一起平均。範圍可以寫成 <code>A2:C21</code>。',a:'=AVERAGE(A2:C21)',need:['AVERAGE']},
+   {c:'SS 組間',d:'20 ×[ (M₁−M總)² + (M₂−M總)² + (M₃−M總)² ]。',
+    a:'=20*((AVERAGE(A2:A21)-AVERAGE(A2:C21))^2+(AVERAGE(B2:B21)-AVERAGE(A2:C21))^2+(AVERAGE(C2:C21)-AVERAGE(A2:C21))^2)',
+    why:'每組平均離總平均的距離平方，乘上該組人數，再加總。'},
+   {c:'SS 組內',d:'用 <code>DEVSQ</code> 分別算三欄的離差平方和，再相加。',
+    a:'=DEVSQ(A2:A21)+DEVSQ(B2:B21)+DEVSQ(C2:C21)',need:['DEVSQ'],
+    why:'DEVSQ 就是 Σ(X−M)²，專門為這種場合而生。'},
+   {c:'SS 總（驗算）',d:'直接用 <code>DEVSQ</code> 算全部 60 筆的離差平方和。它應該等於上面兩個相加。',
+    a:'=DEVSQ(A2:C21)',need:['DEVSQ'],
+    why:'如果 SS組間 + SS組內 ≠ SS總，一定是前面哪一步算錯了。這是 ANOVA 最好用的驗算。'},
+   {c:'MS 組間',d:'SS 組間 ÷ df 組間（k − 1 = 2）。',
+    a:'=20*((AVERAGE(A2:A21)-AVERAGE(A2:C21))^2+(AVERAGE(B2:B21)-AVERAGE(A2:C21))^2+(AVERAGE(C2:C21)-AVERAGE(A2:C21))^2)/2'},
+   {c:'MS 組內',d:'SS 組內 ÷ df 組內（N − k = 57）。',
+    a:'=(DEVSQ(A2:A21)+DEVSQ(B2:B21)+DEVSQ(C2:C21))/57'},
+   {c:'F 值',d:'MS 組間 ÷ MS 組內。',
+    a:'=(20*((AVERAGE(A2:A21)-AVERAGE(A2:C21))^2+(AVERAGE(B2:B21)-AVERAGE(A2:C21))^2+(AVERAGE(C2:C21)-AVERAGE(A2:C21))^2)/2)/((DEVSQ(A2:A21)+DEVSQ(B2:B21)+DEVSQ(C2:C21))/57)',
+    why:'F = 15.20，和網站上方 ANOVA 表裡的數字完全一致。'},
+   {c:'p 值',d:'用 <code>F.DIST.RT</code>，三個參數是 F 值、df₁ = 2、df₂ = 57。',
+    a:'=F.DIST.RT((20*((AVERAGE(A2:A21)-AVERAGE(A2:C21))^2+(AVERAGE(B2:B21)-AVERAGE(A2:C21))^2+(AVERAGE(C2:C21)-AVERAGE(A2:C21))^2)/2)/((DEVSQ(A2:A21)+DEVSQ(B2:B21)+DEVSQ(C2:C21))/57),2,57)',
+    need:['F.DIST.RT'],
+    why:'F 永遠只看右尾，所以是 RT（right tail）。'},
+   {c:'η²',d:'SS 組間 ÷ SS 總。',
+    a:'=20*((AVERAGE(A2:A21)-AVERAGE(A2:C21))^2+(AVERAGE(B2:B21)-AVERAGE(A2:C21))^2+(AVERAGE(C2:C21)-AVERAGE(A2:C21))^2)/DEVSQ(A2:C21)',
+    why:'.348，組別解釋了記憶分數 34.8% 的變異。'},
+   {c:'驗證 F = t²',d:'只比較前兩欄：算 <code>T.TEST</code> 之外的 t 值，再平方。這一格請直接算 t 的平方。',
+    a:'=((AVERAGE(A2:A21)-AVERAGE(B2:B21))/(SQRT((19*VAR.S(A2:A21)+19*VAR.S(B2:B21))/38)*SQRT(1/20+1/20)))^2',
+    why:'如果把同樣兩組拿去做單因子 ANOVA，得到的 F 就是這個數字。兩組時 t 檢定與 ANOVA 是同一件事。'}
+  ]})
+];
+
+/* ================= 11 ================= */
+EXTRA[11]=[
+ SEC('公式從哪裡來'),
+ DERIVE('交互作用 = 「主要效果解釋不了的部分」',[
+  {m:'先假設沒有交互作用：每一格的平均都能被「列效果 + 欄效果」預測',
+   w:'也就是 <i>μ<sub>jk</sub></i> = <i>μ</i> + <i>α<sub>j</sub></i> + <i>β<sub>k</sub></i>，其中 α 是列效果、β 是欄效果。這叫<b>可加性模型</b>——畫出來就是兩條平行線。'},
+  {m:'用資料估這三項：<i>α<sub>j</sub></i> = <i>M<sub>j</sub></i>· − <i>M</i>，<i>β<sub>k</sub></i> = <i>M</i>·<sub><i>k</i></sub> − <i>M</i>',
+   w:'列平均減總平均、欄平均減總平均。這兩組估計值各自加起來都是 0。'},
+  {m:'預測值：<i>M<sub>j</sub></i>· + <i>M</i>·<sub><i>k</i></sub> − <i>M</i>',
+   w:'把 μ + α + β 展開：M + (M<sub>j</sub>·− M) + (M·<sub>k</sub> − M) = M<sub>j</sub>· + M·<sub>k</sub> − M。<b>總平均被減掉一次，因為它在兩個效果裡各被算了一次。</b>'},
+  {m:'殘餘 = 實際細格平均 − 預測值 = <i>M<sub>jk</sub></i> − <i>M<sub>j</sub></i>· − <i>M</i>·<sub><i>k</i></sub> + <i>M</i>',
+   w:'這就是交互作用的<b>定義</b>：可加性模型解釋不了的那一部分。全部是 0 → 完全沒有交互作用 → 兩條線平行。'},
+  {m:'SS<sub>A×B</sub> = <i>n</i> × Σ(殘餘)²',
+   w:'和前面所有 SS 一樣：把偏離量平方、乘上每格人數、加總。'},
+  {m:'自由度 = (<i>a</i>−1)(<i>b</i>−1)',
+   w:'ab 個殘餘看起來有 ab 個自由度，但每一列加起來是 0（用掉 a 個限制）、每一欄加起來是 0（再用掉 b 個，其中一個重複），剩下 ab − a − b + 1 = (a−1)(b−1)。<b>3×2 設計就是 2。</b>'},
+  {m:'為什麼交叉時不能解釋主要效果',
+   w:'主要效果是把另一個因子「平均掉」之後的結果。若一個因子在 A 水準下是正效果、B 水準下是負效果，平均起來可能接近 0——於是你會報告「沒有效果」，而事實是「有兩個相反的效果」。這不是保守，是錯誤。'},
+  {m:'本課程資料的實際情況',
+   w:'性別的主要效果 F(1, 54) = 1.48，p = .230，不顯著；但交互作用 F(2, 54) = 4.47，p = .016，顯著。原因就在上面：睡眠限制對男生的傷害明顯大於女生，但其他兩組男女差不多，平均起來就看不出性別效果了。'}
+ ]),
+ SEC('一步一步手算'),
+ HAND('inter'),
+ SEC('動手做'),
+ P('下面 B、C 欄是<b>六個細格的平均數</b>（每格 10 人），直接用它們把交互作用算出來。D、E、F 是輔助欄，要自己填。'),
+ LAB({title:'動手做 11：把交互作用從細格平均裡挖出來',hint:'D = 列平均，E、F = 殘餘',
+  headers:SH_CELL.headers,rows:SH_CELL.rows,
+  open:[{label:'列平均',a:'=AVERAGE(B{r}:C{r})'},
+        {label:'女的殘餘',a:'=B{r}-D{r}-AVERAGE($B$2:$B$4)+AVERAGE($B$2:$C$4)'},
+        {label:'男的殘餘',a:'=C{r}-D{r}-AVERAGE($C$2:$C$4)+AVERAGE($B$2:$C$4)'}],
+  tasks:[
+   {c:'總平均',d:'六個細格平均的平均（平衡設計才能這樣算）。',a:'=AVERAGE(B2:C4)',need:['AVERAGE']},
+   {c:'女生的欄平均',d:'B 欄三格的平均。',a:'=AVERAGE(B2:B4)'},
+   {c:'男生的欄平均',d:'C 欄三格的平均。',a:'=AVERAGE(C2:C4)',
+    why:'兩個欄平均差不多（約 1.7 分），這就是性別主要效果不顯著的原因。'},
+   {c:'殘餘總和',d:'把 E、F 兩欄填好之後加總。<b>應該是 0</b>。',a:'=SUM(E2:F4)',need:['SUM'],tol:1e-9,
+    hintWrong:'殘餘 = 細格平均 − 列平均 − 欄平均 + 總平均。四項都要有，少一項就不會歸零。',
+    why:'殘餘總和為 0，是「已經把兩個主要效果都扣乾淨」的證據。'},
+   {c:'Σ 殘餘²',d:'用 <code>SUMSQ</code> 算 E2:F4 的平方和。',a:'=SUMSQ(E2:F4)',need:['SUMSQ']},
+   {c:'SS 交互作用',d:'每格 n = 10，所以 SS = 10 × Σ殘餘²。',a:'=10*SUMSQ(E2:F4)',
+    why:'約 242，和前面 ANOVA 表裡的交互作用 SS 一致（細格平均有四捨五入，所以會差一點點）。'},
+   {c:'MS 交互作用',d:'SS ÷ df，df = (3−1)(2−1) = 2。',a:'=10*SUMSQ(E2:F4)/2'},
+   {c:'F 交互作用',d:'MS 交互作用 ÷ MS 誤差。誤差 MS 請直接用 27.11（從完整資料算出來的）。',
+    a:'=10*SUMSQ(E2:F4)/2/27.11',
+    why:'F ≈ 4.5，p ≈ .016。你剛剛用六個數字就把交互作用重建出來了。'},
+   {c:'殘餘的全距',d:'用 <code>MAX(E2:F4)-MIN(E2:F4)</code> 看看殘餘散得多開。',
+    a:'=MAX(E2:F4)-MIN(E2:F4)',need:['MAX','MIN'],
+    why:'殘餘的全距越大，交互作用越強。實際看哪一格最偏，就知道交互作用是從哪裡來的——這裡是睡眠限制組的男生。'}
+  ]})
+];
+
+/* ================= 12 ================= */
+EXTRA[12]=[
+ SEC('公式從哪裡來'),
+ DERIVE('期望次數為什麼是「列×欄÷總」',[
+  {m:'獨立性的定義：P(<i>A</i> ∩ <i>B</i>) = P(<i>A</i>) × P(<i>B</i>)',
+   w:'如果「在哪一組」和「有沒有達標」真的無關，那麼同時滿足兩者的機率，就等於兩個機率相乘。整個卡方檢定只是把這一行翻譯成次數。'},
+  {m:'用邊際次數估機率：P(第 <i>i</i> 列) = 列總和 / <i>N</i>，P(第 <i>j</i> 欄) = 欄總和 / <i>N</i>',
+   w:'這是最自然的估計：60 人裡有 20 個控制組，就估 P(控制組) = 1/3。'},
+  {m:'所以 P(格 <i>ij</i>) = (列總和 × 欄總和) / <i>N</i>²',
+   w:'兩個機率相乘。'},
+  {m:'期望次數 <i>E<sub>ij</sub></i> = <i>N</i> × P(格 <i>ij</i>) = 列總和 × 欄總和 / <i>N</i>',
+   w:'把機率乘回總人數，一個 N 被約掉。<b>這就是那個公式的全部來源</b>——不是規定，是獨立性假設的直接後果。'},
+  {m:'為什麼是 (<i>O</i>−<i>E</i>)²/<i>E</i> 而不是 (<i>O</i>−<i>E</i>)²',
+   w:'每一格的次數可以看成二項分配，變異數約等於 E（當機率小時）。所以 (O−E)/√E 大致是一個標準化後的量，平方之後才能加總成卡方。<b>除以 E 就是在做標準化</b>，和 t 檢定除以標準誤是同一個動作。'},
+  {m:'為什麼 df = (<i>r</i>−1)(<i>c</i>−1)',
+   w:'rc 格看似有 rc 個自由度，但邊際總和被固定了：列總和給 r 個限制、欄總和給 c 個限制，其中總人數重複算了一次，所以扣掉 r + c − 1。rc − r − c + 1 = (r−1)(c−1)。<b>2×2 表只有 1 個自由度</b>：填好一格，其餘三格就定了。'},
+  {m:'為什麼要求期望次數 ≥ 5',
+   w:'χ² 分配只是這個統計量的<b>近似</b>分配，近似的品質取決於每格的次數夠不夠多。期望次數太小時，離散的次數用連續分配去近似會失準，p 值就不能信——這時要用 Fisher 精確檢定，它直接把所有可能的表列舉出來算精確機率。'},
+  {m:'Cramér\'s V = √(<i>χ</i>² / (<i>N</i> × min(<i>r</i>−1, <i>c</i>−1)))',
+   w:'χ² 會隨 N 成長（同樣的關聯強度，人多就越顯著），所以除以 N 把樣本數的影響拿掉；再除以最大可能值，讓它落在 0 到 1 之間。這和「d 把 t 裡的樣本數拿掉」是完全平行的設計。'}
+ ]),
+ SEC('一步一步手算'),
+ HAND('chisq'),
+ SEC('動手做'),
+ P('下面 B、C 欄是三組的實際次數，D 到 G 是<b>空的輔助欄</b>：請自己把期望次數與每格的貢獻算出來。'),
+ LAB({title:'動手做 12：從期望次數一路算到 Cramér\'s V',hint:'D、E = 期望次數；F、G = 每格貢獻',
+  headers:SH_CT.headers,rows:SH_CT.rows,
+  open:[{label:'E 未達標',a:'=SUM(B{r}:C{r})*SUM($B$2:$B$4)/SUM($B$2:$C$4)'},
+        {label:'E 達標',a:'=SUM(B{r}:C{r})*SUM($C$2:$C$4)/SUM($B$2:$C$4)'},
+        {label:'(O−E)²/E 未',a:'=(B{r}-D{r})^2/D{r}'},
+        {label:'(O−E)²/E 達',a:'=(C{r}-E{r})^2/E{r}'}],
+  tasks:[
+   {c:'總人數 N',d:'把整張表 <code>B2:C4</code> 加總。',a:'=SUM(B2:C4)',need:['SUM']},
+   {c:'控制組的列總和',d:'B2 + C2。',a:'=SUM(B2:C2)'},
+   {c:'未達標的欄總和',d:'B 欄三格相加。',a:'=SUM(B2:B4)'},
+   {c:'控制組未達標的期望次數',d:'列總和 × 欄總和 ÷ N。',a:'=SUM(B2:C2)*SUM(B2:B4)/SUM(B2:C4)',
+    why:'13。實際觀察到 8，比期望少 5 個——控制組的達標率高於整體平均。'},
+   {c:'χ² 統計量',d:'把 F、G 兩個輔助欄填好，再用 <code>SUM</code> 把 <code>F2:G4</code> 全部加起來。',
+    a:'=SUM(F2:G4)',need:['SUM'],
+    hintWrong:'F2 應該是 <code>=(B2-D2)^2/D2</code>，G2 是 <code>=(C2-E2)^2/E2</code>。',
+    why:'χ² = 17.14。限制組達標 0 人（期望 7）貢獻了最大一塊。'},
+   {c:'p 值',d:'用 <code>CHISQ.DIST.RT</code>，df = (3−1)(2−1) = 2。',
+    a:'=CHISQ.DIST.RT(SUM(F2:G4),2)',need:['CHISQ.DIST.RT']},
+   {c:'用 CHISQ.TEST 對答案',d:'用 <code>CHISQ.TEST(觀察範圍, 期望範圍)</code> 直接算 p，看看和上一格一不一樣。',
+    a:'=CHISQ.TEST(B2:C4,D2:E4)',need:['CHISQ.TEST'],
+    why:'一樣。但 CHISQ.TEST 只回 p，不給 χ² 也不給 df——論文要的東西它都沒有，所以還是得自己算。'},
+   {c:"Cramér's V",d:'√(χ² ÷ (N × min(r−1, c−1)))。這裡 min(2,1) = 1。',
+    a:'=SQRT(SUM(F2:G4)/(SUM(B2:C4)*1))',need:['SQRT'],
+    why:'V = .535，很強的關聯。'},
+   {c:'最小期望次數',d:'用 <code>MIN</code> 找出 D2:E4 裡最小的期望次數，檢查是否 ≥ 5。',
+    a:'=MIN(D2:E4)',need:['MIN'],
+    why:'7 ≥ 5，通過前提。如果小於 5，這個 p 值就不能信，要改用 Fisher 精確檢定。'}
+  ]})
+];
+
+/* ================= 13 ================= */
+EXTRA[13]=[
+ SEC('幾何直覺'),
+ GEOM('zquad','拉動滑桿改變真實的 r'),
+ SEC('公式從哪裡來'),
+ DERIVE('為什麼 r 一定落在 −1 和 +1 之間',[
+  {m:'先把兩個變項都轉成 z 分數',
+   w:'這一步不損失任何資訊（第 4 關證過：z 轉換不改變形狀），但可以把單位全部消掉，讓證明乾淨得多。'},
+  {m:'已知：Σ<i>z<sub>X</sub></i>² = Σ<i>z<sub>Y</sub></i>² = <i>n</i> − 1',
+   w:'第 4 關的推導結果。'},
+  {m:'定義：<i>r</i> = Σ(<i>z<sub>X</sub></i> <i>z<sub>Y</sub></i>) / (<i>n</i> − 1)',
+   w:'兩個 z 分數乘積的平均。'},
+  {m:'考慮 Σ(<i>z<sub>X</sub></i> − <i>z<sub>Y</sub></i>)² ≥ 0',
+   w:'任何實數的平方和都不可能是負的。整個證明就靠這一行。'},
+  {m:'展開：Σ<i>z<sub>X</sub></i>² − 2Σ<i>z<sub>X</sub></i><i>z<sub>Y</sub></i> + Σ<i>z<sub>Y</sub></i>² ≥ 0',
+   w:'代入前面的結果：(<i>n</i>−1) − 2<i>r</i>(<i>n</i>−1) + (<i>n</i>−1) ≥ 0'},
+  {m:'化簡：2(<i>n</i>−1)(1 − <i>r</i>) ≥ 0　⟹　<i>r</i> ≤ 1',
+   w:'而且等號成立（r = 1）<b>只在每個人的 z<sub>X</sub> 都恰好等於 z<sub>Y</sub> 時</b>——也就是所有點完全落在同一條直線上。'},
+  {m:'同理考慮 Σ(<i>z<sub>X</sub></i> + <i>z<sub>Y</sub></i>)² ≥ 0，得到 <i>r</i> ≥ −1',
+   w:'兩邊夾起來：−1 ≤ r ≤ 1。這是一個<b>嚴格的數學上界</b>，算出 1.03 就一定是算錯了，不是資料特別。'},
+  {m:'<i>r</i>² 的意義：被解釋的變異比例',
+   w:'用 X 去預測 Y 時，SS<sub>殘差</sub> = (1 − <i>r</i>²)SS<sub>Y</sub>。所以 r² 就是「用了 X 之後，Y 的變異少掉的比例」。r = .3 → r² = .09，只少掉 9%。'},
+  {m:'為什麼 <i>r</i> 對離群值那麼敏感',
+   w:'r 是 z 乘積的平均，而 z 已經是標準化過的距離。一個離群點的 z<sub>X</sub> 與 z<sub>Y</sub> 都可能到 3 以上，乘積就是 9 以上——在 n = 30 的資料裡，它一個人就能貢獻 9/29 ≈ 0.31 的 r。<b>一個點改變 0.3 的相關係數，這就是為什麼一定要畫散布圖。</b>'}
+ ]),
+ SEC('一步一步手算'),
+ HAND('r'),
+ SEC('動手做'),
+ LAB({title:'動手做 13：相關、顯著性與信賴區間',hint:'用完整的 60 筆資料',
+  headers:SH_FULL.headers,rows:SH_FULL.rows,
+  tasks:[
+   {c:'r（睡眠 × 記憶）',d:'用 <code>CORREL</code> 算 C 欄與 G 欄的相關。',a:'=CORREL(C2:C61,G2:G61)',need:['CORREL']},
+   {c:'r²',d:'用 <code>RSQ</code>，或把上一格平方。',a:'=RSQ(C2:C61,G2:G61)',need:['RSQ'],
+    why:'.508 — 睡眠解釋了記憶分數一半的變異。'},
+   {c:'t 值',d:'<code>r*SQRT((n-2)/(1-r^2))</code>，n = 60。',
+    a:'=CORREL(C2:C61,G2:G61)*SQRT(58/(1-RSQ(C2:C61,G2:G61)))',
+    why:'相關的顯著性檢定，本質上還是一個 t 檢定。'},
+   {c:'p 值',d:'用 <code>T.DIST.2T</code>，df = n − 2 = 58。',
+    a:'=T.DIST.2T(ABS(CORREL(C2:C61,G2:G61)*SQRT(58/(1-RSQ(C2:C61,G2:G61)))),58)',need:['T.DIST.2T']},
+   {c:'Fisher z 轉換',d:'用 <code>FISHER</code> 把 r 轉成 z（因為 r 的抽樣分配不對稱，要先轉換才能算 CI）。',
+    a:'=FISHER(CORREL(C2:C61,G2:G61))',need:['FISHER'],
+    why:'r 越接近 ±1，抽樣分配越偏斜。Fisher 轉換把它拉成近似常態，才能用 ±1.96 的老方法。'},
+   {c:'CI 下界（z 尺度）',d:'Fisher z 減去 1.96/√(n−3)。',
+    a:'=FISHER(CORREL(C2:C61,G2:G61))-1.96/SQRT(57)'},
+   {c:'CI 下界（轉回 r）',d:'用 <code>FISHERINV</code> 把上一格轉回相關係數的尺度。',
+    a:'=FISHERINV(FISHER(CORREL(C2:C61,G2:G61))-1.96/SQRT(57))',need:['FISHERINV'],
+    why:'約 .56。注意 CI 不是對稱的（上界離 r 比下界近），這正是 Fisher 轉換要處理的問題。'},
+   {c:'CI 上界（轉回 r）',d:'同樣的做法，改成加。',
+    a:'=FISHERINV(FISHER(CORREL(C2:C61,G2:G61))+1.96/SQRT(57))'},
+   {c:'手機 × 記憶的 r',d:'換一對變項：D 欄與 G 欄。',a:'=CORREL(D2:D61,G2:G61)',
+    why:'−.448，中等強度的負相關。但別忘了：睡眠與手機本身也相關，所以這個 −.45 有一部分其實是睡眠的效果——第 14 關的多元迴歸會把它們分開。'},
+   {c:'睡眠 × 手機的 r',d:'算 C 欄與 D 欄的相關。（想做 Spearman 的話，要先用 <code>RANK.AVG</code> 把兩欄各自轉成名次，再對名次做 CORREL——那需要輔助欄，這裡先算 Pearson。）',
+    a:'=CORREL(C2:C61,D2:D61)',
+    why:'−.313。睡得越少的人手機用得越久——兩個預測變項不獨立，這就是多元迴歸存在的理由。'}
+  ]})
+];
+
+/* ================= 14 ================= */
+EXTRA[14]=[
+ SEC('公式從哪裡來'),
+ DERIVE('用微積分解出最小平方法',[
+  {m:'目標函數：SSE(<i>a</i>, <i>b</i>) = Σ(<i>Y<sub>i</sub></i> − <i>a</i> − <i>bX<sub>i</sub></i>)²',
+   w:'我們要找一組 (a, b) 讓這個值最小。它是 a 與 b 的二次函數，而且開口向上，所以<b>唯一的極小值就在偏微分為 0 的地方</b>。'},
+  {m:'對 <i>a</i> 偏微分並設為 0：−2Σ(<i>Y<sub>i</sub></i> − <i>a</i> − <i>bX<sub>i</sub></i>) = 0',
+   w:'也就是 Σ殘差 = 0。<b>「殘差總和為 0」不是資料的性質，是這個方程式的直接結果</b>——所以它永遠成立，不能拿來驗證模型好不好。'},
+  {m:'整理得 <i>a</i> = <i>M<sub>Y</sub></i> − <i>b</i> <i>M<sub>X</sub></i>',
+   w:'兩邊除以 n。順帶得到一個好用的性質：<b>迴歸線一定通過點 (M<sub>X</sub>, M<sub>Y</sub>)</b>。'},
+  {m:'對 <i>b</i> 偏微分並設為 0：−2Σ<i>X<sub>i</sub></i>(<i>Y<sub>i</sub></i> − <i>a</i> − <i>bX<sub>i</sub></i>) = 0',
+   w:'也就是 Σ(X × 殘差) = 0：<b>殘差與 X 正交</b>。這也是數學必然，不是好模型的證據。'},
+  {m:'把 <i>a</i> = <i>M<sub>Y</sub></i> − <i>bM<sub>X</sub></i> 代進去',
+   w:'Σ<i>X<sub>i</sub></i>(<i>Y<sub>i</sub></i> − <i>M<sub>Y</sub></i> + <i>bM<sub>X</sub></i> − <i>bX<sub>i</sub></i>) = 0'},
+  {m:'整理成：<i>b</i> = Σ(<i>X</i>−<i>M<sub>X</sub></i>)(<i>Y</i>−<i>M<sub>Y</sub></i>) / Σ(<i>X</i>−<i>M<sub>X</sub></i>)² = SP / SS<sub><i>X</i></sub>',
+   w:'分子是<b>共變的部分</b>（X 和 Y 一起偏離的程度），分母是 X 自己的變異。斜率就是「兩者共動的量，換算成每單位 X 的效果」。'},
+  {m:'和相關係數的關係：<i>b</i> = <i>r</i> × (<i>s<sub>Y</sub></i> / <i>s<sub>X</sub></i>)',
+   w:'把 SP 與 SS 用 r、s 改寫即可。所以<b>斜率就是相關係數換了個單位</b>：r 是無單位的，b 帶著「Y 的單位 ÷ X 的單位」。這也解釋了為什麼標準化係數 β 在單一預測變項時恰好等於 r。'},
+  {m:'為什麼叫「迴歸」',
+   w:'Galton 發現高個子父親的兒子平均沒那麼高——因為 |r| &lt; 1，預測值的 z 分數（= r × z<sub>X</sub>）一定比 X 的 z 分數更靠近平均。這叫<b>迴歸趨中</b>，是 r 小於 1 的純數學後果，不是遺傳定律。很多「治療有效」的錯覺（極端分數的人第二次測量自然變好）都是這個現象。'},
+  {m:'多元迴歸只是同一件事的矩陣版',
+   w:'b = (X\'X)<sup>−1</sup>X\'y。每個係數的意思變成「<b>把其他預測變項的影響都扣掉之後</b>，這個變項和 Y 的關係」。這就是「控制其他變項」在數學上的確切定義。'}
+ ]),
+ SEC('一步一步手算'),
+ HAND('reg'),
+ SEC('動手做'),
+ P('先用 6 筆小資料把 b 的公式一格一格算出來，你就會知道 <code>SLOPE</code> 到底在做什麼。'),
+ LAB({title:'動手做 14：親手解出最小平方線',hint:'C 到 F 是輔助欄，要自己填',
+  headers:SH_XY.headers,rows:SH_XY.rows,
+  open:[{label:'X−Mx',a:'=A{r}-AVERAGE($A$2:$A$7)'},
+        {label:'Y−My',a:'=B{r}-AVERAGE($B$2:$B$7)'},
+        {label:'乘積',a:'=C{r}*D{r}'},
+        {label:'(X−Mx)²',a:'=C{r}^2'}],
+  tasks:[
+   {c:'SP（乘積和）',d:'把 E 欄加總。',a:'=SUM(E2:E7)',need:['SUM'],
+    hintWrong:'C 欄是 X 減 X 的平均，D 欄是 Y 減 Y 的平均，E 欄是兩者相乘。'},
+   {c:'SSx',d:'把 F 欄加總（也可以用 <code>DEVSQ(A2:A7)</code> 對答案）。',a:'=SUM(F2:F7)',need:['SUM']},
+   {c:'斜率 b',d:'SP ÷ SSx。',a:'=SUM(E2:E7)/SUM(F2:F7)'},
+   {c:'用 SLOPE 對答案',d:'用 <code>SLOPE(Y範圍, X範圍)</code>。<b>注意 Y 在前面</b>，這是最常被弄反的地方。',
+    a:'=SLOPE(B2:B7,A2:A7)',need:['SLOPE'],
+    why:'兩個數字一樣，代表你已經知道 SLOPE 在做什麼了。'},
+   {c:'截距 a',d:'My − b × Mx。',a:'=AVERAGE(B2:B7)-SLOPE(B2:B7,A2:A7)*AVERAGE(A2:A7)'},
+   {c:'用 INTERCEPT 對答案',d:'用 <code>INTERCEPT(Y範圍, X範圍)</code>。',a:'=INTERCEPT(B2:B7,A2:A7)',need:['INTERCEPT']},
+   {c:'驗證：線通過 (Mx, My)',d:'算 a + b × Mx，看看是不是等於 My。',
+    a:'=INTERCEPT(B2:B7,A2:A7)+SLOPE(B2:B7,A2:A7)*AVERAGE(A2:A7)',
+    why:'等於 Y 的平均數。迴歸線一定通過兩個變項的平均點，這是對 a 偏微分的必然結果。'},
+   {c:'預測睡 7 小時',d:'用 <code>FORECAST.LINEAR(7, Y範圍, X範圍)</code>。',
+    a:'=FORECAST.LINEAR(7,B2:B7,A2:A7)',need:['FORECAST'],
+    why:'注意：7 落在資料範圍（5.5–8.2）之內，這叫內插，可靠。預測睡 3 小時就是外推，模型完全沒有那個區域的資訊。'},
+   {c:'R²',d:'用 <code>RSQ(Y範圍, X範圍)</code>。',a:'=RSQ(B2:B7,A2:A7)',need:['RSQ']},
+   {c:'b = r × (sy/sx) 驗證',d:'用 <code>CORREL</code> 乘上兩個標準差的比值，看看是不是等於 b。',
+    a:'=CORREL(A2:A7,B2:B7)*STDEV.S(B2:B7)/STDEV.S(A2:A7)',
+    why:'完全相同。斜率就是相關係數換了單位——這一行把第 13 關和第 14 關縫在一起了。'}
+  ]})
+];
+
+/* ================= 15 ================= */
+EXTRA[15]=[
+ SEC('公式從哪裡來'),
+ DERIVE('為什麼樣本一大，常態性檢定就一定顯著',[
+  {m:'先想清楚常態性檢定的 H₀ 是什麼',
+   w:'H₀：「母體<b>恰好</b>是常態分配」。注意「恰好」兩個字——這是一個點假設，要求分配函數完全吻合，一絲不差。'},
+  {m:'但真實資料的母體幾乎不可能恰好常態',
+   w:'心理量表有上下限（不可能無限延伸），分數常常是整數（不連續），反應時間不可能為負。<b>所以 H₀ 在現實中幾乎永遠是假的</b>，只是假得多或假得少。'},
+  {m:'而任何檢定的檢定力都隨 <i>n</i> 增加',
+   w:'第 8 關推過：檢定統計量大致隨 √n 成長。所以只要 H₀ 有一點點假，樣本夠大就一定抓得到。'},
+  {m:'結論：n 很大時，Shapiro-Wilk 幾乎一定顯著',
+   w:'它顯著只證明「偏離不是 0」，完全沒說「偏離大到會影響你的分析」。<b>它回答的不是你真正想問的問題。</b>'},
+  {m:'反過來，n 很小時它又太鈍',
+   w:'n = 15 時，即使母體明顯偏斜，Shapiro-Wilk 也常常不顯著。於是它在「你最需要擔心常態性」的情況（小樣本）下最沒有用，在「你最不需要擔心」的情況（大樣本，中央極限定理生效）下最容易報警。<b>兩邊都反了。</b>'},
+  {m:'該怎麼做',
+   w:'看 <b>Q-Q 圖</b>（偏離的形狀與大小，不是有沒有偏離）、看<b>偏態與峰度</b>（有數字可報）、想想 <b>n 夠不夠大</b>（中央極限定理救不救得了你）。把常態性檢定當成參考，不是判決。'},
+  {m:'同一個邏輯也適用於 Levene 與 Mauchly',
+   w:'它們全都是「前提檢定」，全都有一樣的病：大樣本過度敏感、小樣本太鈍。這正是「乾脆一律用 Welch」「乾脆一律用 Greenhouse-Geisser 校正」這類建議背後的共同理由——<b>用一個永遠安全的方法，勝過用一個不可靠的檢定去決定該用哪個方法。</b>'}
+ ]),
+ NOTE('key','常態性到底是誰要常態','ANOVA 與迴歸假設的是<b>殘差</b>常態，不是原始資料常態。這份課程資料裡，記憶分數整體看起來略偏，但那有一部分是三組平均不同造成的「混合分配」——把組別效果扣掉之後的殘差反而更接近常態。所以檢查常態性時，該檢查的是殘差，不是依變項本身。'),
+ SEC('一步一步手算'),
+ HAND('levene'),
+ SEC('動手做'),
+ LAB({title:'動手做 15：自己跑一次 Levene 檢定',hint:'C、D 是輔助欄：每個人離自己組中位數的絕對距離',
+  headers:SH_TWO.headers,rows:SH_TWO.rows,
+  open:[{label:'|甲−Mdn|',a:'=ABS(A{r}-MEDIAN($A$2:$A$6))'},
+        {label:'|乙−Mdn|',a:'=ABS(B{r}-MEDIAN($B$2:$B$6))'}],
+  tasks:[
+   {c:'甲組中位數',d:'用 <code>MEDIAN</code>。',a:'=MEDIAN(A2:A6)',need:['MEDIAN']},
+   {c:'乙組中位數',d:'同樣用 <code>MEDIAN</code>。',a:'=MEDIAN(B2:B6)'},
+   {c:'兩組絕對差的平均差',d:'把 C、D 兩欄填好後，算 C 欄平均減 D 欄平均。',
+    a:'=AVERAGE(C2:C6)-AVERAGE(D2:D6)',
+    hintWrong:'C2 應該是 <code>=ABS(A2-MEDIAN($A$2:$A$6))</code>。',
+    why:'這個差如果接近 0，代表兩組的「散開程度」差不多。'},
+   {c:'Levene 的 F',d:'對 C、D 兩欄做一次<b>獨立樣本 t 檢定的 t 值再平方</b>（兩組時 F = t²）。',
+    a:'=((AVERAGE(C2:C6)-AVERAGE(D2:D6))/(SQRT((4*VAR.S(C2:C6)+4*VAR.S(D2:D6))/8)*SQRT(1/5+1/5)))^2',
+    why:'Levene 檢定就是「對絕對離差做 ANOVA」。兩組時它等於對絕對離差做 t 檢定再平方。'},
+   {c:'Levene 的 p',d:'用 <code>F.DIST.RT</code>，df₁ = 1、df₂ = 8。',
+    a:'=F.DIST.RT(((AVERAGE(C2:C6)-AVERAGE(D2:D6))/(SQRT((4*VAR.S(C2:C6)+4*VAR.S(D2:D6))/8)*SQRT(1/5+1/5)))^2,1,8)',
+    need:['F.DIST.RT'],
+    why:'p 很大，沒有證據說兩組變異數不同。'},
+   {c:'兩組變異數比',d:'甲組變異數 ÷ 乙組變異數。',a:'=VAR.S(A2:A6)/VAR.S(B2:B6)',
+    why:'經驗法則：比值在 0.25 到 4 之間，變異數同質的違反通常不足以造成問題（尤其人數相等時）。'},
+   {c:'甲組的偏態',d:'用 <code>SKEW</code>。',a:'=SKEW(A2:A6)',need:['SKEW'],
+    why:'n = 5 時偏態極不穩定，這個數字幾乎沒有參考價值——這本身就是一課：小樣本不要相信形狀統計量。'},
+   {c:'第一個值的自然對數',d:'用 <code>LN</code> 算甲組第一個分數（A2）的自然對數，感受一下轉換在做什麼。',
+    a:'=LN(A2)',need:['LN'],
+    why:'對數轉換把大的值壓縮得比小的值多，所以能拉平右偏。代價是所有結果都變成對數尺度，解讀要跟著改。'}
+  ]})
+];
+
+/* ================= 16 ================= */
+EXTRA[16]=[
+ SEC('把整門課縫起來'),
+ P('最後一件事：前面學的 t 檢定、變異數分析、相關、迴歸，<b>其實是同一個模型</b>。看懂這一點，你就不再需要死記「什麼時候用哪個」——你只是在問「我的預測變項是什麼型態」。'),
+ DERIVE('t、ANOVA、迴歸都是同一個線性模型',[
+  {m:'通用形式：<i>Y</i> = <i>b</i><sub>0</sub> + <i>b</i><sub>1</sub><i>X</i><sub>1</sub> + <i>b</i><sub>2</sub><i>X</i><sub>2</sub> + … + <i>e</i>',
+   w:'一個依變項，一組預測變項，加上誤差。這叫<b>一般線性模式 (General Linear Model)</b>。以下每一個「不同的檢定」，都只是這個式子的特例。'},
+  {m:'單一樣本 <i>t</i>：<i>Y</i> = <i>b</i><sub>0</sub> + <i>e</i>',
+   w:'沒有預測變項，只有截距。檢定 b₀ = μ₀ 就是單一樣本 t 檢定。'},
+  {m:'獨立樣本 <i>t</i>：<i>Y</i> = <i>b</i><sub>0</sub> + <i>b</i><sub>1</sub><i>X</i>，其中 <i>X</i> 是 0/1 的虛擬變項',
+   w:'X = 0 時預測值是 b₀（甲組平均），X = 1 時是 b₀ + b₁（乙組平均）。所以 <b>b₁ 就是兩組的平均差</b>，檢定 b₁ = 0 就是獨立樣本 t 檢定，連 t 值都一模一樣。'},
+  {m:'單因子 ANOVA（k 組）：用 <i>k</i> − 1 個虛擬變項',
+   w:'三組需要兩個 0/1 變項就能完整表示。檢定「這兩個係數同時為 0」就是那個整體 F 檢定。<b>k − 1 這個數字，就是組間自由度的來源。</b>'},
+  {m:'二因子 ANOVA：主要效果的虛擬變項 + 它們的<b>乘積項</b>',
+   w:'交互作用在迴歸裡就是 X₁ × X₂ 這一項。所以「交互作用」和「調節效果 (moderation)」在數學上是同一件事，只是不同傳統的叫法。'},
+  {m:'ANCOVA：虛擬變項 + 連續的共變項',
+   w:'把兩種預測變項混在同一個式子裡而已。一旦用 GLM 的眼光看，ANCOVA 就沒有任何神秘之處。'},
+  {m:'相關：把 <i>X</i> 和 <i>Y</i> 都標準化後的斜率',
+   w:'<i>r</i> = <i>b</i> × (<i>s<sub>X</sub></i>/<i>s<sub>Y</sub></i>)。相關與簡單迴歸是同一個東西的兩種表達。'},
+  {m:'所以「選檢定」真正在問的是三件事',
+   w:'① 依變項是什麼型態（連續 → GLM；二分 → 邏輯斯迴歸；次數 → 卡方／Poisson）；② 預測變項是類別還是連續；③ 觀察值之間獨立嗎（不獨立 → 重複量數或多層次模型）。<b>第 16 關那張總表，其實就是這三個問題的展開。</b>'},
+  {m:'所以下一步該學什麼',
+   w:'不是再多背幾個檢定名稱，而是把<b>迴歸</b>學深：虛擬編碼、交互作用項、共變項、殘差診斷。學會用迴歸的語言思考之後，多層次模型、SEM、邏輯斯迴歸都只是同一個框架的延伸。'}
+ ]),
+ SEC('最後的動手做'),
+ P('把整門課走一遍：從原始資料到一句可以直接貼進論文的 APA 句子。'),
+ LAB({title:'動手做 16：從資料到 APA 句子',hint:'控制組（第 2–21 列）vs 睡眠限制組（第 22–41 列）的記憶分數',
+  headers:SH_FULL.headers,rows:SH_FULL.rows,
+  tasks:[
+   {c:'① M₁',d:'控制組記憶分數的平均。',a:'=AVERAGE(G2:G21)'},
+   {c:'② SD₁',d:'控制組記憶分數的標準差。',a:'=STDEV.S(G2:G21)'},
+   {c:'③ t 值',d:'平均差 ÷ (sₚ×√(1/20+1/20))。',
+    a:'=(AVERAGE(G2:G21)-AVERAGE(G22:G41))/(SQRT((19*VAR.S(G2:G21)+19*VAR.S(G22:G41))/38)*SQRT(1/20+1/20))'},
+   {c:'④ p 值',d:'用 <code>T.DIST.2T</code>，df = 38。',
+    a:'=T.DIST.2T(ABS((AVERAGE(G2:G21)-AVERAGE(G22:G41))/(SQRT((19*VAR.S(G2:G21)+19*VAR.S(G22:G41))/38)*SQRT(1/20+1/20))),38)'},
+   {c:"⑤ Cohen's d",d:'平均差 ÷ sₚ。',
+    a:'=(AVERAGE(G2:G21)-AVERAGE(G22:G41))/SQRT((19*VAR.S(G2:G21)+19*VAR.S(G22:G41))/38)'},
+   {c:'⑥ CI 下界',d:'平均差 − t₍.975,38₎ × SE。',
+    a:'=(AVERAGE(G2:G21)-AVERAGE(G22:G41))-T.INV.2T(0.05,38)*SQRT((19*VAR.S(G2:G21)+19*VAR.S(G22:G41))/38)*SQRT(1/20+1/20)'},
+   {c:'⑦ CI 上界',d:'平均差 + t₍.975,38₎ × SE。',
+    a:'=(AVERAGE(G2:G21)-AVERAGE(G22:G41))+T.INV.2T(0.05,38)*SQRT((19*VAR.S(G2:G21)+19*VAR.S(G22:G41))/38)*SQRT(1/20+1/20)'},
+   {c:'⑧ 組出 APA 句子',d:'用 <code>&amp;</code> 把文字和數字接起來，<code>ROUND</code> 控制小數位，<code>IF</code> 處理 p &lt; .001。目標字串：<br><code>t(38) = 4.75, p &lt; .001, d = 1.5</code>',
+    a:'="t(38) = "&ROUND((AVERAGE(G2:G21)-AVERAGE(G22:G41))/(SQRT((19*VAR.S(G2:G21)+19*VAR.S(G22:G41))/38)*SQRT(1/20+1/20)),2)&", p "&IF(T.DIST.2T(ABS((AVERAGE(G2:G21)-AVERAGE(G22:G41))/(SQRT((19*VAR.S(G2:G21)+19*VAR.S(G22:G41))/38)*SQRT(1/20+1/20))),38)<0.001,"< .001","= "&ROUND(T.DIST.2T(ABS((AVERAGE(G2:G21)-AVERAGE(G22:G41))/(SQRT((19*VAR.S(G2:G21)+19*VAR.S(G22:G41))/38)*SQRT(1/20+1/20))),38),3))&", d = "&ROUND((AVERAGE(G2:G21)-AVERAGE(G22:G41))/SQRT((19*VAR.S(G2:G21)+19*VAR.S(G22:G41))/38),2)',
+    need:['IF','ROUND'],
+    hintWrong:'記得用雙引號包文字，用 <code>&amp;</code> 連接。',
+    why:'注意 d 顯示成 1.5 而不是 1.50——Excel 會吃掉尾隨的 0，真正要排版時得用 TEXT() 函數。這正是為什麼最後一步還是要人看過，不能全自動。'},
+   {c:'⑨ 另一組的 p（衛教組 vs 控制組）',d:'用 <code>T.TEST</code> 比較 G2:G21 與 G42:G61，尾數 2、類型 2。',
+    a:'=T.TEST(G2:G21,G42:G61,2,2)',need:['T.TEST'],
+    why:'p 不顯著。四週的睡眠衛教沒有讓記憶超越原本作息就正常的人——這是一個誠實而且很常見的結果，不要寫成「沒有效果」，要寫成「未發現顯著差異」。'},
+   {c:'⑩ 多重比較校正',d:'三組兩兩比較共 3 次，把 ⑨ 的 p 乘以 3（Bonferroni）。',
+    a:'=MIN(1,T.TEST(G2:G21,G42:G61,2,2)*3)',need:['MIN'],
+    why:'用 MIN(1, …) 是因為機率不能超過 1。這就是 Bonferroni 校正最原始的做法。'}
+  ]})
+];
+
+</script>
+<script>
 /* ===================== 應用程式 ===================== */
 const GN=['控制組','睡眠限制組','睡眠衛教組'], SN=['女','男'];
 const VAR={sleep:'平均睡眠時數',phone:'每日手機使用',pre:'焦慮前測',post:'焦慮後測',mem:'記憶測驗分數'};
@@ -1775,6 +3701,11 @@ function renderBlock(b){
     case 'soft': return softEl(b);
     case 'sim': return simEl(b);
     case 'out': return outEl(b.k);
+    case 'sec': return secEl(b);
+    case 'derive': return deriveEl(b);
+    case 'hand': return handEl(b.k);
+    case 'geom': return geomEl(b.k,b.cap);
+    case 'lab': return labEl(b,CUR_STAGE);
   }
   return E('div');
 }
@@ -2970,7 +4901,9 @@ function homeView(){
   f.appendChild(bs); w.appendChild(f);
   return w;
 }
+let CUR_STAGE=0;
 function stageView(s){
+  CUR_STAGE=s.id;
   const w=E('div','wrap');
   const hd=E('div','stage-head');
   hd.appendChild(E('div','eyebrow','<span>第 '+String(s.id).padStart(2,'0')+' 關</span><span class="dot"></span>'+
@@ -2980,7 +4913,8 @@ function stageView(s){
   const g=E('div','goals'); s.goals.forEach(x=>g.appendChild(E('span','goal',x))); hd.appendChild(g);
   w.appendChild(hd);
   const body=E('div','body');
-  s.body.forEach(b=>body.appendChild(renderBlock(b)));
+  const blocks=s.body.concat((typeof EXTRA!=='undefined'&&EXTRA[s.id])?EXTRA[s.id]:[]);
+  blocks.forEach(b=>body.appendChild(renderBlock(b)));
   w.appendChild(body);
   w.appendChild(quizEl(s));
   return w;
