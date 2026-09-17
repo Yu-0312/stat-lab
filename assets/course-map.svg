@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans TC', 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9" fill="none" stroke="#64748B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect width="960" height="560" rx="16" fill="#0F172A"/>
+
+  <text x="48" y="48" fill="#F8FAFC" font-size="22" font-weight="600">睡眠研究統計教室 · 課程地圖</text>
+  <text x="48" y="74" fill="#94A3B8" font-size="13">16 關 · 一份睡眠介入研究資料（N = 60）· Excel / JASP / SPSS 三軟體並行</text>
+
+  <!-- Part 1 -->
+  <rect x="48" y="110" width="168" height="168" rx="12" fill="#1E293B" stroke="#38BDF8" stroke-width="1.5"/>
+  <rect x="64" y="126" width="56" height="22" rx="6" fill="#38BDF8"/>
+  <text x="92" y="141" text-anchor="middle" fill="#0F172A" font-size="11" font-weight="700">篇一</text>
+  <text x="64" y="176" fill="#F8FAFC" font-size="14" font-weight="600">讀懂一份資料</text>
+  <text x="64" y="204" fill="#94A3B8" font-size="11">01 認識你的資料</text>
+  <text x="64" y="224" fill="#94A3B8" font-size="11">02 描述統計</text>
+  <text x="64" y="244" fill="#94A3B8" font-size="11">03 看見分配與離群值</text>
+  <text x="64" y="264" fill="#38BDF8" font-size="11" font-weight="500">3 關</text>
+
+  <!-- Part 2 -->
+  <rect x="232" y="110" width="168" height="168" rx="12" fill="#1E293B" stroke="#4ADE80" stroke-width="1.5"/>
+  <rect x="248" y="126" width="56" height="22" rx="6" fill="#4ADE80"/>
+  <text x="276" y="141" text-anchor="middle" fill="#0F172A" font-size="11" font-weight="700">篇二</text>
+  <text x="248" y="176" fill="#F8FAFC" font-size="14" font-weight="600">從樣本推論母體</text>
+  <text x="248" y="204" fill="#94A3B8" font-size="11">04 常態與 z 分數</text>
+  <text x="248" y="224" fill="#94A3B8" font-size="11">05 抽樣分配與 CLT</text>
+  <text x="248" y="244" fill="#94A3B8" font-size="11">06 信賴區間</text>
+  <text x="248" y="260" fill="#94A3B8" font-size="11">07 假設檢定與 p 值</text>
+  <text x="248" y="274" fill="#4ADE80" font-size="11" font-weight="500">5 關 · 08 檢定力</text>
+
+  <!-- Part 3 -->
+  <rect x="416" y="110" width="168" height="168" rx="12" fill="#1E293B" stroke="#FBBF24" stroke-width="1.5"/>
+  <rect x="432" y="126" width="56" height="22" rx="6" fill="#FBBF24"/>
+  <text x="460" y="141" text-anchor="middle" fill="#0F172A" font-size="11" font-weight="700">篇三</text>
+  <text x="432" y="176" fill="#F8FAFC" font-size="14" font-weight="600">比較平均數</text>
+  <text x="432" y="204" fill="#94A3B8" font-size="11">09 t 檢定三兄弟</text>
+  <text x="432" y="224" fill="#94A3B8" font-size="11">10 單因子 ANOVA</text>
+  <text x="432" y="244" fill="#94A3B8" font-size="11">11 二因子 ANOVA</text>
+  <text x="432" y="264" fill="#FBBF24" font-size="11" font-weight="500">3 關 · 交互作用</text>
+
+  <!-- Part 4 -->
+  <rect x="600" y="110" width="168" height="168" rx="12" fill="#1E293B" stroke="#A78BFA" stroke-width="1.5"/>
+  <rect x="616" y="126" width="56" height="22" rx="6" fill="#A78BFA"/>
+  <text x="644" y="141" text-anchor="middle" fill="#0F172A" font-size="11" font-weight="700">篇四</text>
+  <text x="616" y="176" fill="#F8FAFC" font-size="14" font-weight="600">關係與預測</text>
+  <text x="616" y="204" fill="#94A3B8" font-size="11">12 卡方檢定</text>
+  <text x="616" y="224" fill="#94A3B8" font-size="11">13 相關</text>
+  <text x="616" y="244" fill="#94A3B8" font-size="11">14 迴歸分析</text>
+  <text x="616" y="264" fill="#A78BFA" font-size="11" font-weight="500">3 關</text>
+
+  <!-- Part 5 -->
+  <rect x="784" y="110" width="132" height="168" rx="12" fill="#1E293B" stroke="#F472B6" stroke-width="1.5"/>
+  <rect x="800" y="126" width="56" height="22" rx="6" fill="#F472B6"/>
+  <text x="828" y="141" text-anchor="middle" fill="#0F172A" font-size="11" font-weight="700">篇五</text>
+  <text x="800" y="176" fill="#F8FAFC" font-size="14" font-weight="600">做完整</text>
+  <text x="800" y="196" fill="#F8FAFC" font-size="14" font-weight="600">的分析</text>
+  <text x="800" y="226" fill="#94A3B8" font-size="11">15 前提檢查</text>
+  <text x="800" y="244" fill="#94A3B8" font-size="11">16 選對檢定</text>
+  <text x="800" y="264" fill="#F472B6" font-size="11" font-weight="500">2 關 · APA</text>
+
+  <!-- Arrows -->
+  <line x1="216" y1="194" x2="230" y2="194" stroke="#64748B" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="400" y1="194" x2="414" y2="194" stroke="#64748B" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="584" y1="194" x2="598" y2="194" stroke="#64748B" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="768" y1="194" x2="782" y2="194" stroke="#64748B" stroke-width="2" marker-end="url(#ar)"/>
+
+  <!-- Software tabs banner -->
+  <rect x="48" y="306" width="868" height="56" rx="10" fill="#0B3B3C" stroke="#2DD4BF" stroke-width="1.5"/>
+  <text x="72" y="340" fill="#5EEAD4" font-size="13" font-weight="600">每一關底部都有三軟體分頁</text>
+  <rect x="300" y="320" width="100" height="28" rx="6" fill="#134E4A"/>
+  <text x="350" y="338" text-anchor="middle" fill="#99F6E4" font-size="12" font-weight="500">Excel</text>
+  <rect x="420" y="320" width="100" height="28" rx="6" fill="#134E4A"/>
+  <text x="470" y="338" text-anchor="middle" fill="#99F6E4" font-size="12" font-weight="500">JASP</text>
+  <rect x="540" y="320" width="100" height="28" rx="6" fill="#134E4A"/>
+  <text x="590" y="338" text-anchor="middle" fill="#99F6E4" font-size="12" font-weight="500">SPSS</text>
+  <text x="670" y="340" fill="#5EEAD4" font-size="12">函數 · 選單路徑 · 可貼上語法</text>
+
+  <!-- Features -->
+  <text x="48" y="400" fill="#F8FAFC" font-size="15" font-weight="600">互動引擎</text>
+
+  <rect x="48" y="418" width="200" height="88" rx="10" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+  <text x="68" y="446" fill="#38BDF8" font-size="12" font-weight="600">16 個互動模擬器</text>
+  <text x="68" y="468" fill="#94A3B8" font-size="11">CLT 抽樣 · CI 覆蓋率</text>
+  <text x="68" y="486" fill="#64748B" font-size="10">p 值尾端 · 檢定力曲線 · 拖曳 ANOVA</text>
+
+  <rect x="268" y="418" width="220" height="88" rx="10" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+  <text x="288" y="446" fill="#4ADE80" font-size="12" font-weight="600">數字現場算</text>
+  <text x="288" y="468" fill="#94A3B8" font-size="11">t / F / χ² / 迴歸由 JS 即時計算</text>
+  <text x="288" y="486" fill="#64748B" font-size="10">已對照 scipy.stats 驗證，不是截圖</text>
+
+  <rect x="508" y="418" width="200" height="88" rx="10" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+  <text x="528" y="446" fill="#FBBF24" font-size="12" font-weight="600">一份資料貫穿</text>
+  <text x="528" y="468" fill="#94A3B8" font-size="11">控制 / 睡眠限制 / 睡眠衛教</text>
+  <text x="528" y="486" fill="#64748B" font-size="10">從第 1 關用到第 16 關</text>
+
+  <rect x="728" y="418" width="188" height="88" rx="10" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+  <text x="748" y="446" fill="#A78BFA" font-size="12" font-weight="600">進度追蹤</text>
+  <text x="748" y="468" fill="#94A3B8" font-size="11">依序解鎖 · 測驗紀錄</text>
+  <text x="748" y="486" fill="#64748B" font-size="10">localStorage · 可一鍵全解鎖</text>
+</svg>
