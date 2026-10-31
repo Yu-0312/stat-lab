@@ -3616,7 +3616,8 @@ const noz=s=>s.replace(/^(-?)0\./,'$1.');
 const fp=p=>p<.001?'&lt; .001':'= '+noz(p.toFixed(3));
 const fpBare=p=>p<.001?'&lt;.001':noz(p.toFixed(3));
 const fr=(v,d=2)=>noz(v.toFixed(d));
-const esc=s=>String(s).replace(/&(?![a-z#]+;)/g,'&amp;');
+// 只轉義還不是 HTML 實體的 &（課程程式碼內刻意寫了 &lt; 等實體）。不會轉義 < >，不能用在使用者輸入上。
+const escAmp=s=>String(s).replace(/&(?![a-z#]+;)/g,'&amp;');
 const E=(tag,cls,html)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(html!=null)n.innerHTML=html;return n;};
 
 /* --- 主題色 --- */
@@ -3730,7 +3731,7 @@ function softEl(b){
       if(k==='p')body.appendChild(E('p',null,v));
       else if(k==='h')body.appendChild(E('h5',null,v));
       else if(k==='path')body.appendChild(E('div','path',v));
-      else if(k==='code'){const pre=E('pre','code');pre.innerHTML=esc(v);body.appendChild(pre);}
+      else if(k==='code'){const pre=E('pre','code');pre.innerHTML=escAmp(v);body.appendChild(pre);}
       else if(k==='ol'){const u=E('ol','steps');v.forEach(i=>u.appendChild(E('li',null,'<span>'+i+'</span>')));body.appendChild(u);}
       else if(k==='ul'){const u=E('ul','ul');v.forEach(i=>u.appendChild(E('li',null,i)));body.appendChild(u);}
     });
